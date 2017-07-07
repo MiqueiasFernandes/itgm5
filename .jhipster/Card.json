@@ -1,0 +1,82 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "cenario",
+            "otherEntityName": "cenario",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "nome",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "url",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "https",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "meta",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "previa",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "disposicao",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "tipo",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "linha",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "coluna",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "modo",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "caminho",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "arquivo",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "extensao",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "largura",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "classe",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "codigo",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20170618002723",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "card",
+    "pagination": "pagination"
+}

@@ -1,0 +1,92 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "ajuste",
+            "otherEntityName": "base",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "validacao",
+            "otherEntityName": "base",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "modeloExclusivo",
+            "otherEntityName": "modeloExclusivo",
+            "relationshipType": "many-to-many",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "prognose"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "nome",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "caminho",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "mapeamento",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "salvar",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "graficos",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "estatisticas",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "forcepredict",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "dividir",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "agrupar",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "treino",
+            "fieldType": "Float"
+        },
+        {
+            "fieldName": "fncalculavolume",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "status",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "codigo",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "maxlength"
+            ],
+            "fieldValidateRulesMaxlength": "60000"
+        },
+        {
+            "fieldName": "resultado",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20170619041208",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "prognose",
+    "pagination": "pagination"
+}
