@@ -42,6 +42,7 @@ const ENTITY_STATES = [
         PrognosePopupComponent,
         PrognoseDeleteDialogComponent,
         PrognoseDeletePopupComponent,
+        FabAddPrognoseComponent,
     ],
     providers: [
         PrognoseService,

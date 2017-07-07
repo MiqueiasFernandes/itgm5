@@ -3,6 +3,7 @@ import { Http, Response, URLSearchParams, BaseRequestOptions } from '@angular/ht
 import { Observable } from 'rxjs/Rx';
 
 import { Card } from './card.model';
+import {Cenario} from '../cenario/cenario.model';
 @Injectable()
 export class CardService {
 
@@ -53,5 +54,30 @@ export class CardService {
             options.search = params;
         }
         return options;
+    }
+
+    getCards(): Observable<Card[]> {
+        return this.query({
+            page: 0,
+            size: 777,
+            sort: ['id']
+        }).map((res: Response ) => res.json());
+    }
+
+    getCardsByCenario(cenario: Cenario): Observable<Card[]> {
+        return this.getCards()
+            .map((cards: Card[]) => {
+
+                const cars: Card[] = [];
+
+                cards.forEach((card: Card) => {
+                    if (card.cenario.id === cenario.id) {
+                        cars.push(card);
+                    }
+                });
+
+                return cars;
+
+            });
     }
 }

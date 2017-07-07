@@ -1,3 +1,20 @@
-<p>
-  fab-add-terminal works!
-</p>
+<div class="modal-header">
+    <h4 class="modal-title">Adicionar novo Terminal Emulado</h4>
+    <button aria-label="Close" data-dismiss="modal" class="close" type="button" (click)="close()"><span aria-hidden="true">x</span>
+    </button>
+</div>
+<div class="modal-body">
+    <jhi-alert></jhi-alert>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control"  id="nome" placeholder="digite o nome do terminal" [(ngModel)]="terminal.nome">
+                <img src="../../../../content/images/load.gif" alt="carregando..." [ngClass]="{visivel: onLoad, invisivel: !onLoad}">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button (click)="adicionarTerminal()" class="btn btn-primary"  [disabled]="onLoad">Criar</button>
+</div>

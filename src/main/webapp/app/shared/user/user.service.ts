@@ -3,6 +3,7 @@ import { Http, Response, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 
 import { User } from './user.model';
+import {Account} from './account.model';
 
 @Injectable()
 export class UserService {
@@ -41,5 +42,18 @@ export class UserService {
 
     delete(login: string): Observable<Response> {
         return this.http.delete(`${this.resourceUrl}/${login}`);
+    }
+
+    public getUser(account: Account): Observable<User> {
+        return  this.query()
+            .map((res: Response) => {
+                const users: User[] = res.json();
+                for (let i = 0; i < users.length; i++) {
+                    const user: User = users[i];
+                    if (user.login === account.login && user.email === account.email) {
+                        return user;
+                    }
+                }
+            });
     }
 }

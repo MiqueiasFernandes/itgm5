@@ -1,3 +1,250 @@
-<p>
-  fab-add-prognose works!
-</p>
+<div class="modal-header">
+    <h4 class="modal-title">Adicionar novo Terminal Emulado</h4>
+    <button aria-label="Close" data-dismiss="modal" class="close" type="button" (click)="close()"><span aria-hidden="true">x</span>
+    </button>
+</div>
+<div class="modal-body">
+    <jhi-alert></jhi-alert>
+    <div class="row">
+        <div class="col-12">
+
+            <div class="wizard clearfix vertical">
+                <div class="steps clearfix">
+                    <ul>
+                        <li class="first" [ngClass]="{'done': atual > 1, 'current': atual === 1}" (click)="goto(1)">
+                            <a>
+                                <span class="current-info audible" *ngIf="atual === 1">current step: </span>
+                                <span class="number">1.</span> Bases
+                                <i *ngIf="etapa > 1" class="fa fa-check"></i>
+                            </a>
+                        </li>
+                        <li [ngClass]="{'done': etapa > 2 || (etapa === 2 && atual < 2), 'current': atual === 2, 'disabled': etapa < 2 }" (click)="goto(2)">
+                            <a>
+                                <span class="current-info audible" *ngIf="atual === 2">current step: </span>
+                                <span class="number">2.</span> Modelos
+                                <i *ngIf="etapa > 2" class="fa fa-check"></i>
+                            </a>
+                        </li>
+                        <li [ngClass]="{'done': etapa > 3 || (etapa === 3 && atual < 3), 'current': atual === 3, 'disabled': etapa < 3 }" (click)="goto(3)">
+                            <a>
+                                <span class="current-info audible" *ngIf="atual === 3">current step: </span>
+                                <span class="number">3.</span> Estatisticas
+                                <i *ngIf="etapa > 3" class="fa fa-check"></i>
+                            </a>
+                        </li>
+                        <li [ngClass]="{'done': etapa > 4 || (etapa === 4 && atual < 4), 'current': atual === 4, 'disabled': etapa < 4 }" (click)="goto(4)">
+                            <a>
+                                <span class="current-info audible" *ngIf="atual === 4">current step: </span>
+                                <span class="number">4.</span> Gráficos
+                                <i *ngIf="etapa > 4" class="fa fa-check"></i>
+                            </a>
+                        </li>
+                        <li [ngClass]="{'done': etapa > 5 || (etapa === 5 && atual < 5), 'current': atual === 5, 'disabled': etapa < 5 }" (click)="goto(5)">
+                            <a>
+                                <span class="current-info audible" *ngIf="atual === 5">current step: </span>
+                                <span class="number">5.</span> Mapeamento
+                                <i *ngIf="etapa > 5" class="fa fa-check"></i>
+                            </a>
+                        </li>
+                        <li class="last" [ngClass]="{'done': etapa === 6 && atual < 6, 'current': atual === 6, 'disabled': etapa < 6 }" (click)="goto(6)">
+                            <a>
+                                <span class="current-info audible" *ngIf="atual === 6">current step: </span>
+                                <span class="number">6.</span> Revisar
+                                <i *ngIf="etapa > 6" class="fa fa-check"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="content clearfix">
+
+                    <section class="body" [ngClass]="{'current': atual === 1, 'invisivel': atual !== 1}">
+                        <p>
+                            Quantas bases de dados serão utilizadas?
+                        </p>
+
+                        <div class="form-group">
+                            <input type="radio" id="uma" name="bases"  (change)="radiobases($event)">
+                            <label for="uma">Uma única base de dados para ajuste e avaliação</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="radio" id="duas" name="bases"  (change)="radiobases($event)">
+                            <label for="duas">Duas bases de dados diferentes, uma para ajuste e uma avaliação</label>
+                        </div>
+
+                        Base para  {{ avaliacao.bases.modo === 2 ? ' ajuste:' : ' ajuste e validação:'}}
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labelBase1}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let base of bases">
+                                    <a class="dropdown-item" (click)="setBase1(base)">
+                                        {{base.nome}} ({{base.id}})
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div *ngIf="avaliacao.bases.modo === 2">
+                            Base para validação:
+                            <div ngbDropdown class="nav-item dropdown pointer">
+                                <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                    {{labelBase2}}
+                                </button>
+                                <ul class="dropdown-menu" ngbDropdownMenu>
+                                    <li *ngFor="let base of bases">
+                                        <a class="dropdown-item" (click)="setBase2(base)">
+                                            {{base.nome}} ({{base.id}})
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div *ngIf="avaliacao.bases.modo === 1">
+                            <p>Defina o percentual para treino:</p>
+                            <div class="form-group">
+                                <label for="treino">Treino: </label>
+                                <input type="number" id="treino" [(ngModel)]="avaliacao.bases.percentual" min="0.1" max="0.9" step="0.1">
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <section class="body" [ngClass]="{'current': atual === 2, 'invisivel': atual !== 2}">
+                        <p>
+                            Quais modelos serão avaliados?
+                            <br>
+                            obs.: os modelos devem estar mapeados.
+                        </p>
+
+                        Modelos:
+
+                        <ul>
+                            <li *ngFor="let modelo of modelos">
+                                <input type="checkbox" id="'modelo-' + {{modelo.id}}" (change)="addModelo($event, modelo)">
+                                <label for="'modelo-' + {{modelo.id}}">{{modelo.nome}} ({{modelo.id}})</label>
+                            </li>
+                        </ul>
+
+                    </section>
+
+                    <section class="body" [ngClass]="{'current': atual === 3, 'invisivel': atual !== 3}">
+                        <p>
+                            Quais estatisticas serão utilizadas para avaliar os modelos?
+                        </p>
+
+                        <ul>
+                            <li *ngFor="let estatistica of estatisticasLabel;let id = index">
+                                <input type="checkbox" id="'estat-' + {{id}}" (change)="addEstatistica($event, estatisticas[id])">
+                                <label for="'estat-' + {{id}}">{{estatistica}}</label>
+                            </li>
+                        </ul>
+
+                    </section>
+
+                    <section class="body" [ngClass]="{'current': atual === 4, 'invisivel': atual !== 4}">
+                        <p>
+                            Quais gráficos devem ser gerados?
+                        </p>
+
+                        <ul>
+                            <li *ngFor="let estatistica of graficosLabel;let id = index">
+                                <input type="checkbox" id="'graf-' + {{id}}" (change)="addGraficos($event, graficos[id])">
+                                <label for="'graf-' + {{id}}">{{estatistica}}</label>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="body" [ngClass]="{'current': atual === 5, 'invisivel': atual !== 5}">
+                        <p>
+                            Qual campo/coluna na base de dados representa:
+                        </p>
+
+
+                        DAP1:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labeldap1}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setdap1(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        DAP2:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labeldap2}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setdap2(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        HT1:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labelht1}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setht1(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        HT2:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labelht2}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setht2(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+
+
+                    </section>
+
+                    <section class="body" [ngClass]="{'current': atual === 6, 'invisivel': atual !== 6}">
+                        <p>
+                            Verifique as configurações:
+                        </p>
+
+
+
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button (click)="voltar()" class="btn btn-primary"  [disabled]="onLoad" [ngClass]="{'invisivel':  etapa <= primeira}">
+            Voltar
+        </button>
+        <button (click)="avancar()" class="btn btn-primary"  [disabled]="onLoad" [ngClass]="{'invisivel':  etapa >= ultima}" style="margin-right: 25%;">
+            Avançar
+        </button>
+        <button (click)="enviar()" class="btn btn-success"  [disabled]="onLoad || etapa < ultima">
+            Criar
+        </button>
+    </div>
+</div>

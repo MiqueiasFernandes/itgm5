@@ -1,4 +1,60 @@
 
+.terminal > div.body {
+    padding: 10px;
+    background-color: black;
+}
+
+
+.linha{
+    font-family: 'Inconsolata', monospace;
+    margin-bottom: 5px;
+    color: #c5c5c5;
+}
+
+.linha-input{
+    font-family: 'Inconsolata', monospace;
+    color:  #006be9;
+}
+.linha-error{
+    font-family: 'Inconsolata', monospace;
+    color:  red;
+}
+
+
+#terminal{
+    font-family: 'Inconsolata', monospace;
+    width: 100%;
+    font-size: 14px;
+}
+
+#prompt{
+    font-family: 'Inconsolata', monospace;
+    float: left;
+    margin-top: 1px;
+    color: #006be9;
+    font-size: 16px;
+}
+
+#type {
+    font-family: 'Inconsolata', monospace;
+    font-size: 16px;
+    background-color: black;
+    outline: none;
+    color: white;
+    border: none;
+    border-color: transparent;
+    padding: 0;
+    margin: 0;
+    width: 98%;
+}
+
+.default{
+    color: black;
+}
+
+
+
+
 /* ==========================================================================
 Main page styles
 ========================================================================== */
@@ -7,7 +63,7 @@ Main page styles
     display: inline-block;
     width: 347px;
     height: 497px;
-    background: url("../../content/images/hipster.png") no-repeat center top;
+    background: url("../../content/images/itgm.png") no-repeat center top;
     background-size: contain;
 }
 
@@ -20,7 +76,7 @@ only screen and (        min-device-pixel-ratio: 2),
 only screen and (                min-resolution: 192dpi),
 only screen and (                min-resolution: 2dppx) {
     .hipster {
-        background: url("../../content/images/hipster2x.png") no-repeat center top;
+        background: url("../../content/images/itgm.png") no-repeat center top;
         background-size: contain;
     }
 }

@@ -3,6 +3,8 @@ import { Http, Response, URLSearchParams, BaseRequestOptions } from '@angular/ht
 import { Observable } from 'rxjs/Rx';
 
 import { Cenario } from './cenario.model';
+import { Projeto } from '../index';
+
 @Injectable()
 export class CenarioService {
 
@@ -53,5 +55,53 @@ export class CenarioService {
             options.search = params;
         }
         return options;
+    }
+
+    public getCenariosByProjeto(projeto: Projeto): Observable<Cenario[]> {
+        return this.query({
+            page: 0,
+            size: 100,
+            sort: ['id']
+        }).map(
+            (res: Response) => {
+                if (!projeto) {
+                    return [];
+                }
+                const cens: Cenario[] = res.json();
+                const cenarios: Cenario[] = [];
+                cens.forEach((cenario) => {
+                    if (cenario.projeto.id === projeto.id) {
+                        cenarios.push(cenario);
+                    }
+                });
+                return cenarios;
+            });
+    }
+
+    public listFiles(cenario: Cenario): Observable<string> {
+        return this.http.get(`${this.resourceUrl}/listar/${cenario.id}`)
+            .map((res) => res.json().files);
+    }
+
+    // @PathVariable Long id,
+    // @RequestParam("diretorio") String diretorio,
+    // @RequestParam("subdiretorio") String subdiretorio,
+    // @RequestParam("file") String file,
+    // @RequestParam("meta") boolean meta,
+    // @RequestParam("content") boolean conteudo,
+    // @RequestParam("cript") boolean cript,
+    // @RequestParam("image") boolean image
+
+    public publicarArquivo(c: Cenario,
+                           d: string,
+                           s: string,
+                           f: string,
+                           m: boolean,
+                           content: boolean,
+                           cript: boolean,
+                           i: boolean): Observable<any> {
+            return this.http
+                .get(`${this.resourceUrl}/publicar/${c.id}/?diretorio=${d}&subdiretorio=${s}&file=${f}&meta=${m}&content=${content}&cript=${cript}&image=${i}`)
+                .map((res) => res.json());
     }
 }

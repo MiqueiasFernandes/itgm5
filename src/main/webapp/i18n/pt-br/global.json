@@ -17,6 +17,7 @@
                 "terminal": "Terminal",
                 "card": "Card",
                 "prognose": "Prognose",
+                "avaliacao": "Avaliacao",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
@@ -51,7 +52,10 @@
             "confirmpassword": "Confirmação de nova senha",
             "confirmpassword.placeholder": "Confirme a nova senha",
             "email": "Email",
-            "email.placeholder": "Seu email"
+            "email.placeholder": "Seu email",
+            "image": "Escolha seu avatar",
+            "entidades": "Exibir menu entidades?",
+            "servidor": "Servidor r [ITGMRest]"
         },
         "messages": {
             "info": {

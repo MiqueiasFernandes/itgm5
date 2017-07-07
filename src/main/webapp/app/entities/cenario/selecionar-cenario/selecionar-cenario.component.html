@@ -1,3 +1,33 @@
-<p>
-  selecionar-cenario works!
-</p>
+<div class="modal-header">
+    <h4 class="modal-title">Selecionar Cenario</h4>
+    <button aria-label="Close" data-dismiss="modal" class="close" type="button" (click)="close()"><span aria-hidden="true">x</span>
+    </button>
+</div>
+<div class="modal-body">
+    <jhi-alert></jhi-alert>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="dropdown pointer">
+
+                Cenario:
+                <div ngbDropdown class="nav-item dropdown pointer">
+                    <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                        {{titulo}}
+                    </button>
+                    <ul class="dropdown-menu" ngbDropdownMenu>
+                        <li *ngFor="let cenario of cenarios">
+                            <a class="dropdown-item" (click)="selecionar(cenario)">
+                                {{cenario.nome}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button (click)="adicionarCenario()" class="btn btn-success">Novo</button>
+    <button (click)="alterarCenario()" class="btn btn-primary">feito</button>
+</div>
