@@ -15,6 +15,7 @@ import {
     prognosePopupRoute,
     PrognoseResolvePagingParams,
 } from './';
+import { FabAddPrognoseComponent } from './fab-add-prognose/fab-add-prognose.component';
 
 const ENTITY_STATES = [
     ...prognoseRoute,
@@ -33,6 +34,7 @@ const ENTITY_STATES = [
         PrognoseDeleteDialogComponent,
         PrognosePopupComponent,
         PrognoseDeletePopupComponent,
+        FabAddPrognoseComponent,
     ],
     entryComponents: [
         PrognoseComponent,

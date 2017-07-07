@@ -15,6 +15,7 @@ import {
     terminalPopupRoute,
     TerminalResolvePagingParams,
 } from './';
+import { FabAddTerminalComponent } from './fab-add-terminal/fab-add-terminal.component';
 
 const ENTITY_STATES = [
     ...terminalRoute,
@@ -33,6 +34,7 @@ const ENTITY_STATES = [
         TerminalDeleteDialogComponent,
         TerminalPopupComponent,
         TerminalDeletePopupComponent,
+        FabAddTerminalComponent,
     ],
     entryComponents: [
         TerminalComponent,
