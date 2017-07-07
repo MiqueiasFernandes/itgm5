@@ -33,7 +33,7 @@ public class PrognoseResource {
     private final Logger log = LoggerFactory.getLogger(PrognoseResource.class);
 
     private static final String ENTITY_NAME = "prognose";
-        
+
     private final PrognoseRepository prognoseRepository;
 
     public PrognoseResource(PrognoseRepository prognoseRepository) {
@@ -92,7 +92,7 @@ public class PrognoseResource {
     @Timed
     public ResponseEntity<List<Prognose>> getAllPrognoses(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Prognoses");
-        Page<Prognose> page = prognoseRepository.findAll(pageable);
+        Page<Prognose> page = prognoseRepository.findByUserIsCurrentUser(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/prognoses");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

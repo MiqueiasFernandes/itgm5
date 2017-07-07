@@ -7,6 +7,7 @@ import com.itgm.config.Constants;
 import com.itgm.repository.UserRepository;
 import com.itgm.security.AuthoritiesConstants;
 import com.itgm.security.SecurityUtils;
+import com.itgm.service.jriaccess.Itgmrest;
 import com.itgm.service.util.RandomUtil;
 import com.itgm.service.dto.UserDTO;
 
@@ -54,6 +55,17 @@ public class UserService {
                 // activate given user for the registration key.
                 user.setActivated(true);
                 user.setActivationKey(null);
+
+                Itgmrest.createNewFile(
+                    user.getLogin(),
+                    "*",
+                    "*",
+                    "*",
+                    "data/",
+                    ".info",
+                    user.toString() + "\nAtivado por: " + key
+                );
+
                 log.debug("Activated user: {}", user);
                 return user;
             });

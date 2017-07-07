@@ -32,7 +32,7 @@ public class CardResource {
     private final Logger log = LoggerFactory.getLogger(CardResource.class);
 
     private static final String ENTITY_NAME = "card";
-        
+
     private final CardRepository cardRepository;
 
     public CardResource(CardRepository cardRepository) {
@@ -91,7 +91,17 @@ public class CardResource {
     @Timed
     public ResponseEntity<List<Card>> getAllCards(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Cards");
-        Page<Card> page = cardRepository.findAll(pageable);
+        Page<Card> page;
+
+//        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN")) {
+//            if (pageable.getPageSize() == 777)
+//                page = cardRepository.findByUserIsCurrentUser(pageable);
+//            else
+//                page = cardRepository.findAll(pageable);
+//        }
+//        else
+            page = cardRepository.findByUserIsCurrentUser(pageable);
+
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/cards");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

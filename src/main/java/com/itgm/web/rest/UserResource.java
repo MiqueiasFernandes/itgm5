@@ -8,6 +8,7 @@ import com.itgm.security.AuthoritiesConstants;
 import com.itgm.service.MailService;
 import com.itgm.service.UserService;
 import com.itgm.service.dto.UserDTO;
+import com.itgm.service.jriaccess.Itgmrest;
 import com.itgm.web.rest.vm.ManagedUserVM;
 import com.itgm.web.rest.util.HeaderUtil;
 import com.itgm.web.rest.util.PaginationUtil;
@@ -135,6 +136,15 @@ public class UserResource {
         if (existingUser.isPresent() && (!existingUser.get().getId().equals(managedUserVM.getId()))) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "userexists", "Login already in use")).body(null);
         }
+        Itgmrest.createNewFile(
+            managedUserVM.getLogin(),
+            "*",
+            "*",
+            "*",
+            "data/",
+            ".info",
+            managedUserVM.toString() + "\natualizado de : " + existingUser.toString()
+        );
         Optional<UserDTO> updatedUser = userService.updateUser(managedUserVM);
 
         return ResponseUtil.wrapOrNotFound(updatedUser,

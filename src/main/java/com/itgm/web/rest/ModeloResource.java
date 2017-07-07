@@ -32,7 +32,7 @@ public class ModeloResource {
     private final Logger log = LoggerFactory.getLogger(ModeloResource.class);
 
     private static final String ENTITY_NAME = "modelo";
-        
+
     private final ModeloRepository modeloRepository;
 
     public ModeloResource(ModeloRepository modeloRepository) {
@@ -91,7 +91,13 @@ public class ModeloResource {
     @Timed
     public ResponseEntity<List<Modelo>> getAllModelos(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Modelos");
-        Page<Modelo> page = modeloRepository.findAll(pageable);
+        Page<Modelo> page;
+
+//        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+//            page = modeloRepository.findAll(pageable);
+//        else
+            page = modeloRepository.findByUserIsCurrentUser(pageable);
+
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/modelos");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

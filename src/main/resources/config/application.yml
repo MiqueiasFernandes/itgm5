@@ -45,7 +45,11 @@ spring:
             enabled: false
     thymeleaf:
         mode: XHTML
-
+    http:
+        multipart:
+            enabled: true
+            max-file-size: 200MB
+            max-request-size: 200MB
 security:
     basic:
         enabled: false
@@ -82,7 +86,7 @@ jhipster:
         #allow-credentials: true
         #max-age: 1800
     mail:
-        from: itgm@localhost
+        from: forestgrowthsoftware@gmail.com
     swagger:
         default-include-pattern: /api/.*
         title: itgm API

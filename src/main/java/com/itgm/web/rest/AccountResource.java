@@ -8,6 +8,7 @@ import com.itgm.security.SecurityUtils;
 import com.itgm.service.MailService;
 import com.itgm.service.UserService;
 import com.itgm.service.dto.UserDTO;
+import com.itgm.service.jriaccess.Itgmrest;
 import com.itgm.web.rest.vm.KeyAndPasswordVM;
 import com.itgm.web.rest.vm.ManagedUserVM;
 import com.itgm.web.rest.util.HeaderUtil;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -199,4 +201,45 @@ public class AccountResource {
             password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
             password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH;
     }
+
+    @PostMapping("/account/image")
+    public ResponseEntity<String> imageUpload(
+        @RequestParam("file") MultipartFile file) {
+        User user = userService.getUserWithAuthorities();
+        String token = "";
+        System.out.println("Tentando enviar " + file + "... ");
+        if (Itgmrest.postBinario(
+            user.getLogin(),
+            "*",
+            "*",
+            "*",
+            file.getOriginalFilename(),
+            "data/", file)) {
+            System.out.println("Imagem " + file + " enviada, publicando... ");
+            token = Itgmrest.publicFile(
+               user.getLogin(),
+               "*",
+               "*",
+               "*",
+               "data/",
+               file.getOriginalFilename(),
+               false,
+               false
+            );
+            System.out.println("Imagem " + file + " publicada em " + token);
+        }
+        return new ResponseEntity<String>("{\"image\":\"" + token + "\"}", HttpStatus.OK);
+    }
+
+    /**
+     * GET  /endereco : get the status of server.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the status in body
+     */
+    @GetMapping("/status")
+    @Timed
+    public ResponseEntity<String> getStatus() {
+        return new ResponseEntity("{\"status\":"+ Itgmrest.isServerAlive() + "}", HttpStatus.OK);
+    }
+
 }
