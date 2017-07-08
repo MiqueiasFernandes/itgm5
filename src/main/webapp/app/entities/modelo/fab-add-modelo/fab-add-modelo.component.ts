@@ -6,9 +6,9 @@ import { Modelo, ModeloService } from '../';
 import { Principal, User, UserService, Account } from '../../../shared';
 
 @Component({
-  selector: 'jhi-fab-add-modelo',
-  templateUrl: './fab-add-modelo.component.html',
-  styles: []
+    selector: 'jhi-fab-add-modelo',
+    templateUrl: './fab-add-modelo.component.html',
+    styles: []
 })
 export class FabAddModeloComponent implements OnInit {
 
@@ -53,8 +53,18 @@ export class FabAddModeloComponent implements OnInit {
     }
 
     criarModelo() {
-        if (this.peloCodigo && !this.modelo.nome) {
-            this.modelo.nome = 'modeloSemNomePeloCodigo';
+        if (this.peloCodigo) {
+            if (!this.modelo.nome) {
+                this.modelo.nome = 'modeloSemNomePeloCodigo';
+            }
+        } else {
+            this.modelo.codigo = 'criaModeloGenerico("' +
+                this.modelo.nome + '", "' +
+                this.modelo.formula + '", "' +
+                this.modelo.funcao +
+                '", c("' + this.modelo.variaveis.split(',').join('", "') + '"), "' +
+                this.modelo.palpite + '", requires = "' +
+                this.modelo.requires + '")';
         }
         this.modeloService.create(this.modelo).subscribe(
             (modelo: Modelo) => {

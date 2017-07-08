@@ -80,6 +80,9 @@ public class Prognose implements Serializable {
                inverseJoinColumns = @JoinColumn(name="modelo_exclusivos_id", referencedColumnName="id"))
     private Set<ModeloExclusivo> modeloExclusivos = new HashSet<>();
 
+    @ManyToOne
+    private Cenario cenario;
+
     public Long getId() {
         return id;
     }
@@ -319,6 +322,19 @@ public class Prognose implements Serializable {
 
     public void setModeloExclusivos(Set<ModeloExclusivo> modeloExclusivos) {
         this.modeloExclusivos = modeloExclusivos;
+    }
+
+    public Cenario getCenario() {
+        return cenario;
+    }
+
+    public Prognose cenario(Cenario cenario) {
+        this.cenario = cenario;
+        return this;
+    }
+
+    public void setCenario(Cenario cenario) {
+        this.cenario = cenario;
     }
 
     @Override

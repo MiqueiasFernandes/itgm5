@@ -9,7 +9,7 @@
     <div class="row">
         <textarea
             *ngIf="peloCodigo"
-            placeholder="insira o código aqui..."
+            placeholder="mg = criaModeloGenerico('nomeDoModelo', 'y2~y1+b1+idade1 * idade2', 'nlsLM', c('idade1', 'idade2'), 'b1=0.5', requires = 'minpack.lm')"
             class="form-control"
             [(ngModel)]="modelo.codigo"
             id="codigo">

@@ -1,5 +1,6 @@
 import { Base } from '../base';
 import { ModeloExclusivo } from '../modelo-exclusivo';
+import { Cenario } from '../cenario';
 export class Prognose {
     constructor(
         public id?: number,
@@ -20,7 +21,10 @@ export class Prognose {
         public ajuste?: Base,
         public validacao?: Base,
         public modeloExclusivo?: ModeloExclusivo,
+        public modeloExclusivos?: ModeloExclusivo[],
+        public cenario?: Cenario,
     ) {
         this.forcepredict = false;
+        this.modeloExclusivos = [];
     }
 }

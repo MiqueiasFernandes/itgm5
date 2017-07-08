@@ -28,6 +28,7 @@ import {
 import { ShareService } from '../share/share.service';
 
 import { FolderComponent } from './folder/folder.component';
+import {FabAddPrognoseComponent} from '../../entities/prognose/fab-add-prognose/fab-add-prognose.component';
 
 @Component({
     selector: 'jhi-sidebar',
@@ -39,7 +40,7 @@ import { FolderComponent } from './folder/folder.component';
 })
 export class SidebarComponent implements OnInit {
 
-    private isViewInitialized:boolean = false;
+    // private isViewInitialized = false;
 
     isSidebarFixed = false;
     nome = '';
@@ -70,7 +71,7 @@ export class SidebarComponent implements OnInit {
         private customizeService: CustomizeService,
         private baseService: BaseService,
         private modeloService: ModeloService,
-        private accountService: AccountService,
+        // private accountService: AccountService,
         private cenarioService: CenarioService,
     ) {
         this.isSidebarFixed = sidebarService.isLock();
@@ -87,7 +88,7 @@ export class SidebarComponent implements OnInit {
                             this.projeto = customize.projeto;
                             this.cenario = customize.cenario;
                             this.customize = customize;
-                        }else{
+                        }else {
                             this.projeto =  null;
                             this.cenario =  null;
                             this.customize = null;
@@ -127,7 +128,7 @@ export class SidebarComponent implements OnInit {
                 (account.firstName ? account.firstName : '') + ' ' +
                 (account.lastName ? account.lastName : '');
             this.email = account.email;
-            this.image = account.imageUrl ? ("http://itgm.mikeias.net:8098/temp/" + account.imageUrl) : null;
+            this.image = account.imageUrl ? ('http://itgm.mikeias.net:8098/temp/' + account.imageUrl) : null;
         }
     }
 
@@ -190,7 +191,7 @@ export class SidebarComponent implements OnInit {
             .subscribe(
                 (modelosExclusivos: ModeloExclusivo[]) => {
                     modelosExclusivos.forEach((modeloEx: ModeloExclusivo) => {
-                        this.router.navigate(['/', { outlets: { popup: 'modelo-exclusivo/'+ modeloEx.id + '/delete'} }]);
+                        this.router.navigate(['/', { outlets: { popup: 'modelo-exclusivo/' + modeloEx.id + '/delete'} }]);
                         this.closeMenuModelos();
                     });
                 }
@@ -201,7 +202,7 @@ export class SidebarComponent implements OnInit {
         this.customizeService.getCustomize()
             .subscribe(
                 (customize: Customize) => {
-                    if( customize && customize.projeto) {
+                    if ( customize && customize.projeto) {
                         this.modalService.open(FabAddBaseComponent);
                     }
                 }
@@ -339,6 +340,10 @@ export class SidebarComponent implements OnInit {
     closeMenuArquivos() {
         this.isArquivosOpen = false;
         this.arquivos = [];
+    }
+
+    novaPrognose() {
+        this.modalService.open(FabAddPrognoseComponent, {size: 'lg'});
     }
 
 }

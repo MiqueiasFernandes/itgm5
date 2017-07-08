@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4 class="modal-title">Adicionar novo Terminal Emulado</h4>
+    <h4 class="modal-title">Assitente de Prognoses</h4>
     <button aria-label="Close" data-dismiss="modal" class="close" type="button" (click)="close()"><span aria-hidden="true">x</span>
     </button>
 </div>
@@ -73,7 +73,7 @@
                             <label for="duas">Duas bases de dados diferentes, uma para ajuste e uma avaliação</label>
                         </div>
 
-                        Base para  {{ avaliacao.bases.modo === 2 ? ' ajuste:' : ' ajuste e validação:'}}
+                        Base para  {{ codigo.modo === 2 ? ' ajuste:' : ' ajuste e validação:'}}
                         <div ngbDropdown class="nav-item dropdown pointer">
                             <button class="dropdown-toggle btn-default" ngbDropdownToggle>
                                 {{labelBase1}}
@@ -87,7 +87,7 @@
                             </ul>
                         </div>
 
-                        <div *ngIf="avaliacao.bases.modo === 2">
+                        <div *ngIf="codigo.modo === 2">
                             Base para validação:
                             <div ngbDropdown class="nav-item dropdown pointer">
                                 <button class="dropdown-toggle btn-default" ngbDropdownToggle>
@@ -103,12 +103,26 @@
                             </div>
                         </div>
 
-                        <div *ngIf="avaliacao.bases.modo === 1">
+                        <div *ngIf="codigo.modo === 1">
                             <p>Defina o percentual para treino:</p>
                             <div class="form-group">
                                 <label for="treino">Treino: </label>
-                                <input type="number" id="treino" [(ngModel)]="avaliacao.bases.percentual" min="0.1" max="0.9" step="0.1">
+                                <input type="number" id="treino" [(ngModel)]="prognose.treino" min="0.1" max="0.9" step="0.1">
                             </div>
+                            <p>Defina o campo utilizado como identificador de observações da base:</p>
+                            <div ngbDropdown class="nav-item dropdown pointer">
+                                <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                    {{prognose.dividir}}
+                                </button>
+                                <ul class="dropdown-menu" ngbDropdownMenu>
+                                    <li *ngFor="let campo of campos">
+                                        <a class="dropdown-item" (click)="setDividir(campo)">
+                                            {{campo}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
                         </div>
 
                     </section>
@@ -220,8 +234,6 @@
                             </ul>
                         </div>
 
-
-
                     </section>
 
                     <section class="body" [ngClass]="{'current': atual === 6, 'invisivel': atual !== 6}">
@@ -229,7 +241,12 @@
                             Verifique as configurações:
                         </p>
 
+                        <div class="form-group">
+                            <label for="nome">Dê um nome a essa prognose:</label>
+                            <input type="text" id="nome" [(ngModel)]="prognose.nome" (click)="verificar()">
+                        </div>
 
+                        <textarea class="form-control" [(ngModel)]="prognose.codigo"></textarea>
 
                     </section>
                 </div>
@@ -240,10 +257,10 @@
         <button (click)="voltar()" class="btn btn-primary"  [disabled]="onLoad" [ngClass]="{'invisivel':  etapa <= primeira}">
             Voltar
         </button>
-        <button (click)="avancar()" class="btn btn-primary"  [disabled]="onLoad" [ngClass]="{'invisivel':  etapa >= ultima}" style="margin-right: 25%;">
+        <button (click)="avancar()" class="btn btn-primary"  [disabled]="onLoad || !feito" [ngClass]="{'invisivel':  etapa >= ultima}" style="margin-right: 25%;">
             Avançar
         </button>
-        <button (click)="enviar()" class="btn btn-success"  [disabled]="onLoad || etapa < ultima">
+        <button (click)="enviar()" class="btn btn-success"  [disabled]="onLoad || etapa < ultima || !feito">
             Criar
         </button>
     </div>

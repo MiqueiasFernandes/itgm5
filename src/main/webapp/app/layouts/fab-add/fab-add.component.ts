@@ -8,9 +8,9 @@ import {
     FabAddBaseComponent,
     FabAddModeloComponent,
     FabAddTerminalComponent,
-    FabAddPrognoseComponent,
 } from '../../entities';
 
+import {FabAddPrognoseComponent} from '../../entities/prognose/fab-add-prognose/fab-add-prognose.component';
 import {CustomizeService} from '../../entities/customize/customize.service';
 import {Customize} from '../../entities/customize/customize.model';
 
@@ -76,6 +76,6 @@ export class FabAddComponent {
     }
 
     novaPrognose() {
-        this.modalService.open(FabAddPrognoseComponent);
+        this.modalService.open(FabAddPrognoseComponent, {size: 'lg'});
     }
 }

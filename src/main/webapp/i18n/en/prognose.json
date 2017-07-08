@@ -31,7 +31,8 @@
             "resultado": "Resultado",
             "ajuste": "Ajuste",
             "validacao": "Validacao",
-            "modeloExclusivo": "Modelo Exclusivo"
+            "modeloExclusivo": "Modelo Exclusivo",
+            "cenario": "Cenario"
         }
     }
 }

@@ -31,5 +31,11 @@
                                  referencedColumnNames="id"
                                  referencedTableName="modelo_exclusivo"/>
         
+        <addForeignKeyConstraint baseColumnNames="cenario_id"
+                                 baseTableName="prognose"
+                                 constraintName="fk_prognose_cenario_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="cenario"/>
+
     </changeSet>
 </databaseChangeLog>

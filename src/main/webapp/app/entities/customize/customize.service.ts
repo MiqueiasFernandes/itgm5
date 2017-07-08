@@ -19,7 +19,7 @@ export class CustomizeService {
         private principal: Principal,
         private userService: UserService,
         private eventManager: EventManager,
-        private account: AccountService
+        private account: AccountService,
 
     ) {
         this.registerLoginEvents();

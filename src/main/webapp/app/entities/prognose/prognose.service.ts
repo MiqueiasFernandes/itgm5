@@ -11,6 +11,8 @@ export class PrognoseService {
     constructor(private http: Http) { }
 
     create(prognose: Prognose): Observable<Prognose> {
+        console.log('enviando prognose');
+        console.log(prognose);
         const copy: Prognose = Object.assign({}, prognose);
         return this.http.post(this.resourceUrl, copy).map((res: Response) => {
             return res.json();

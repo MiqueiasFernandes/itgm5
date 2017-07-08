@@ -244,16 +244,18 @@ public class BaseResource {
             )) {
                 return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
             }
-            codigo = "write(" +
+            codigo = "tmp = read.csv('" + nome + "', sep='" + extra + "')\n" +
+                "write(" +
                 "gsub(', ', ',', " +
                 "toString(" +
-                "names(" +
-                "read.csv('" + nome + "', sep='" + extra + "')))), 'campos')";
+                "names( tmp ))), 'campos')\n" +
+                "save(tmp, file=\"" + id + ".RData\")\n";
         } else {
             codigo = "load('../999-temp/" + nome + "')\n" +
                 "write(gsub(', ', ',', toString(names(" + extra + "))), 'campos')\n" +
                 "save.image(\"" + nome + "\")\n" +
-                "save(\""+extra+"\",\"" + nome + extra + ".RData\")\n";
+                "save(" + extra + ", file=\"" + id + ".RData\")\n" +
+                "unlink('../999-temp/', recursive = TRUE, force = TRUE);";
         }
 
         Itgmrest.executarBatch(usuario, projeto, "bases", id, codigo);

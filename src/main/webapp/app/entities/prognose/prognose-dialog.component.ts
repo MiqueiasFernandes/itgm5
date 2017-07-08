@@ -10,6 +10,7 @@ import { PrognosePopupService } from './prognose-popup.service';
 import { PrognoseService } from './prognose.service';
 import { Base, BaseService } from '../base';
 import { ModeloExclusivo, ModeloExclusivoService } from '../modelo-exclusivo';
+import { Cenario, CenarioService } from '../cenario';
 
 @Component({
     selector: 'jhi-prognose-dialog',
@@ -24,6 +25,8 @@ export class PrognoseDialogComponent implements OnInit {
     bases: Base[];
 
     modeloexclusivos: ModeloExclusivo[];
+
+    cenarios: Cenario[];
     constructor(
         public activeModal: NgbActiveModal,
         private jhiLanguageService: JhiLanguageService,
@@ -31,6 +34,7 @@ export class PrognoseDialogComponent implements OnInit {
         private prognoseService: PrognoseService,
         private baseService: BaseService,
         private modeloExclusivoService: ModeloExclusivoService,
+        private cenarioService: CenarioService,
         private eventManager: EventManager
     ) {
         this.jhiLanguageService.setLocations(['prognose']);
@@ -43,6 +47,8 @@ export class PrognoseDialogComponent implements OnInit {
             (res: Response) => { this.bases = res.json(); }, (res: Response) => this.onError(res.json()));
         this.modeloExclusivoService.query().subscribe(
             (res: Response) => { this.modeloexclusivos = res.json(); }, (res: Response) => this.onError(res.json()));
+        this.cenarioService.query().subscribe(
+            (res: Response) => { this.cenarios = res.json(); }, (res: Response) => this.onError(res.json()));
     }
     clear() {
         this.activeModal.dismiss('cancel');
@@ -86,6 +92,10 @@ export class PrognoseDialogComponent implements OnInit {
     }
 
     trackModeloExclusivoById(index: number, item: ModeloExclusivo) {
+        return item.id;
+    }
+
+    trackCenarioById(index: number, item: Cenario) {
         return item.id;
     }
 

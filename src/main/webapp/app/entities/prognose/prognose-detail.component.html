@@ -78,6 +78,12 @@
                 <a [routerLink]="['/modelo-exclusivo', modeloExclusivo?.id ]">{{modeloExclusivo.id}}</a>{{last ? '' : ', '}}
             </span>
         </dd>
+        <dt><span jhiTranslate="itgmApp.prognose.cenario">Cenario</span></dt>
+        <dd>
+            <div *ngIf="prognose.cenario">
+                <a [routerLink]="['/cenario', prognose.cenario?.id]">{{prognose.cenario?.id}}</a>
+            </div>
+        </dd>
     </dl>
 
     <button type="submit"

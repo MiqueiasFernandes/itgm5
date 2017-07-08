@@ -21,7 +21,7 @@ public interface PrognoseRepository extends JpaRepository<Prognose,Long> {
     @Query("select prognose from Prognose prognose left join fetch prognose.modeloExclusivos where prognose.id =:id")
     Prognose findOneWithEagerRelationships(@Param("id") Long id);
 
-    @Query("select prognose from Prognose prognose where prognose.ajuste.projeto.user.login = ?#{principal.username}")
+    @Query("select prognose from Prognose prognose where prognose.cenario.projeto.user.login = ?#{principal.username}")
     Page<Prognose> findByUserIsCurrentUser(Pageable pageable);
 
 }

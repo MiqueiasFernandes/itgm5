@@ -73,8 +73,8 @@ export class FabAddBaseComponent implements OnInit {
     }
 
     onSaveSuccess(base: Base) {
-        this.onLoad = true;
-        this.baseService.sendBase(base, this.file, this.extra).subscribe(
+        this.onLoad = true;  ///////////VERIFICAR ISTO 07/07/2017 ////////////////////////////////
+        this.baseService.sendBase(base, this.tipo === 1 ? this.file : null, this.extra).subscribe(
             (res) => {
                 this.alertService.success(res.toString());
                 this.close();
