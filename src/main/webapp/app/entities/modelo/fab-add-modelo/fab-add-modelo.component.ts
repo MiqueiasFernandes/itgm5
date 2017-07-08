@@ -57,7 +57,7 @@ export class FabAddModeloComponent implements OnInit {
             if (!this.modelo.nome) {
                 this.modelo.nome = 'modeloSemNomePeloCodigo';
             }
-        } else {
+        } else if (!this.modelo.codigo || this.modelo.codigo.length < 5) {
             this.modelo.codigo = 'criaModeloGenerico("' +
                 this.modelo.nome + '", "' +
                 this.modelo.formula + '", "' +

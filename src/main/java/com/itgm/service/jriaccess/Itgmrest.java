@@ -55,8 +55,8 @@ public class Itgmrest {
     private static String buidURIforGET_COMPARTILHADO(String usuario, String token) {
         return PATH_GET_COMPARTILHADO + usuario  + "/" + token;
     }
-    private static String buidURIforGET_STATUS(String usuario, String token) {
-        return PATH_GET_STATUS + usuario  + "/" + token;
+    private static String buidURIforGET_STATUS(String token) {
+        return PATH_GET_STATUS + token;
     }
     private static String buidURIforGET_LIST(String usuario, String projeto, String cenario, String diretorio) {
         return PATH_GET_LIST + usuario  + "/" + projeto + "/" + cenario + "/" + diretorio;
@@ -89,7 +89,7 @@ public class Itgmrest {
             projeto + "/" +
             cenario + "/" +
             diretorio + "/" +
-             file + "?"
+            file + "?"
             + (subdiretorio != null && !subdiretorio.isEmpty() ? "subdiretorio=" + subdiretorio : "")
             + "&meta=" + returnMeta
             + "&image=" + isImage;
@@ -204,6 +204,13 @@ public class Itgmrest {
 
     }
 
+    public static String getStatus(String token) {
+        return (String) getOnTemplate(
+            buidURIforGET_STATUS(token),
+            String.class,
+            "{\"error\":\"indefinido.\"}");
+    }
+
 
     private static boolean postBINARIO(String path, MultipartFile file) {
         try {
@@ -309,27 +316,27 @@ public class Itgmrest {
         deleteOnTemplate(SERVICE + path + "?subdiretorio=" + (subdiretorio != null ? subdiretorio : ""));
     }
 
-    public static void executarBatch(String usuario,
-                                     String projeto,
-                                     String cenario,
-                                     String diretorio,
-                                     String codigo){
+    public static String executarBatch(String usuario,
+                                       String projeto,
+                                       String cenario,
+                                       String diretorio,
+                                       String codigo){
         String query = "?&parametros=BATCH" +
             "&parametros=log.txt" +
             "&parametros=INFO" +
-            "&memoria=500" +
+            "&memoria=2000" +
             "&cpu=100" +
             "&disco=500" +
             "&salvar=true";
         try {
-            postOnTemplate(
+            return (String) postOnTemplate(
                 SERVICE + usuario + "/" +  projeto + "/" +  cenario + "/" +  diretorio + "/" +  query,
                 java.net.URLEncoder.encode(codigo, "UTF-8"),
                 String.class,
-                null
+                ""
             );
         }catch (Exception ex){
-
+            return "";
         }
     }
 

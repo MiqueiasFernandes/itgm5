@@ -18,17 +18,17 @@ import {
     SelecionarCenarioComponent,
     ModeloExclusivo,
     ModeloExclusivoService,
-    MapearModeloComponent,
     FabAddBaseComponent,
     FabAddModeloComponent,
     Customize,
     CustomizeService,
 } from '../../entities/';
 
-import { ShareService } from '../share/share.service';
 
+import { ShareService } from '../share/share.service';
 import { FolderComponent } from './folder/folder.component';
 import {FabAddPrognoseComponent} from '../../entities/prognose/fab-add-prognose/fab-add-prognose.component';
+import {MapearModeloComponent} from '../../entities/modelo-exclusivo/mapear-modelo/mapear-modelo.component';
 
 @Component({
     selector: 'jhi-sidebar',
@@ -297,17 +297,17 @@ export class SidebarComponent implements OnInit {
                 });
     }
 
-    compartilharBase(base: Base){
+    compartilharBase(base: Base) {
         this.shareService.compartilharBase(base);
     }
 
-    compartilharModelo(modelo: Modelo){
+    compartilharModelo(modelo: Modelo) {
         this.shareService.compartilharModelo(modelo);
     }
 
     listar() {
 
-        if(this.isArquivosOpen){
+        if ( this.isArquivosOpen ) {
             this.closeMenuArquivos();
         } else {
             this.loadArquivos = true;

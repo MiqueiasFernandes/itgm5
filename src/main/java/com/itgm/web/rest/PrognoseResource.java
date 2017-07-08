@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.itgm.domain.Prognose;
 
 import com.itgm.repository.PrognoseRepository;
+import com.itgm.service.jriaccess.Itgmrest;
 import com.itgm.web.rest.util.HeaderUtil;
 import com.itgm.web.rest.util.PaginationUtil;
 import io.swagger.annotations.ApiParam;
@@ -55,6 +56,59 @@ public class PrognoseResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new prognose cannot already have an ID")).body(null);
         }
         Prognose result = prognoseRepository.save(prognose);
+
+        result.setCaminho(prognose.getCenario().getCaminho() + "prognose" + prognose.getId());
+
+        result.setCodigo(
+            Itgmrest.executarBatch(
+                prognose.getCenario().getProjeto().getUser().getLogin(),
+                prognose.getCenario().getProjeto().getNome(),
+                prognose.getCenario().getNome(),
+                "prognose" + prognose.getId(),
+                prognose.getCodigo()
+            )
+        );
+
+        result.setStatus(2);
+        final Prognose prog = result = prognoseRepository.save(result);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Prognose prognose1 = prog;
+                final String token = prog.getCodigo();
+                boolean rodando = true;
+                do {
+                    ////obter status
+                    String status = Itgmrest.getStatus(token);
+                    if (status.startsWith("{\"error\":\"processo n") && status.endsWith("encontrado\"}")) {
+                        prognose1.setStatus(4);
+                        prognose1.setCodigo(Itgmrest.getContent(
+                            prognose1.getCenario().getProjeto().getUser().getLogin(),
+                            prognose1.getCenario().getProjeto().getNome(),
+                            prognose1.getCenario().getNome(),
+                            "prognose" + prognose.getId(),
+                            "relatorio.avaliaModeloEspecial.json",
+                            null,
+                            false,
+                            "{}"
+                        ));
+                        rodando = false;
+                    }else{
+                        prognose1.setStatus(4);
+                        prognose1.setCodigo(status);
+                    }
+                    prognoseRepository.save(prognose1);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                        rodando = false;
+                    }
+                }
+                while (rodando);
+            }
+        }).start();
+
         return ResponseEntity.created(new URI("/api/prognoses/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);

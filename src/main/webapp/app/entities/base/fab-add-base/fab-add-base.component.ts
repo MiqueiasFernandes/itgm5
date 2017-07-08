@@ -74,7 +74,7 @@ export class FabAddBaseComponent implements OnInit {
 
     onSaveSuccess(base: Base) {
         this.onLoad = true;  ///////////VERIFICAR ISTO 07/07/2017 ////////////////////////////////
-        this.baseService.sendBase(base, this.tipo === 1 ? this.file : null, this.extra).subscribe(
+        this.baseService.sendBase(base, this.tipo === 1 ? this.file : new File([''], base.nome), this.extra).subscribe(
             (res) => {
                 this.alertService.success(res.toString());
                 this.close();
@@ -99,6 +99,7 @@ export class FabAddBaseComponent implements OnInit {
                         .subscribe(
                             (data) => {
                                 console.log(data);
+                                this.onLoad = false;
                                 if (data.sucesso) {
                                     this.getVar();
                                 } else {
@@ -111,10 +112,8 @@ export class FabAddBaseComponent implements OnInit {
                                 }
                             },
                             () => {
-                                alert('Aguarde 3 segundos e tente novamente! se o arquivo for grande ele aida esta sendo enviado!');
-                            },
-                            () => {
                                 this.onLoad = false;
+                                alert('Aguarde 3 segundos e tente novamente! se o arquivo for grande ele aida esta sendo enviado!');
                             }
                         );
                 }

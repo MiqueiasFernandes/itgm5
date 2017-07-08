@@ -6,9 +6,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 ///https://www.npmjs.com/package/angular2-highlight-js
 // import { HighlightJsModule, HighlightJsService } from 'angular2-highlight-js';
 
-
-
-
 import { Account, LoginModalService, Principal } from '../shared';
 
 import {HomeService} from './home.service';
@@ -29,6 +26,8 @@ import {AccountService} from "../shared/auth/account.service";
 import {Terminal} from "../entities/terminal/terminal.model";
 import {Observable} from "rxjs/Observable";
 import {TerminalService} from "../entities/terminal/terminal.service";
+import {Prognose} from "../entities/prognose/prognose.model";
+import {PrognoseService} from "../entities/prognose/prognose.service";
 
 @Component({
     selector: 'jhi-home',
@@ -63,9 +62,10 @@ export class HomeComponent implements OnInit {
     modalRef: NgbModalRef;
     cards: Card[][] = [];
     dropdows = [];
-    windowRef :any;
+    windowRef: any;
     transitions = [];
     terminais: Terminal[] = [];
+    prognoses: Prognose[] = [];
 
     constructor(
         private jhiLanguageService: JhiLanguageService,
@@ -74,8 +74,8 @@ export class HomeComponent implements OnInit {
         private eventManager: EventManager,
         private homeService: HomeService,
         private customizeService: CustomizeService,
-        private accountService: AccountService,
-        private domSanitizer: DomSanitizer,
+        private prognoseService: PrognoseService,
+        // private domSanitizer: DomSanitizer,
         private terminalService: TerminalService,
     ) {
         this.jhiLanguageService.setLocations(['home']);
@@ -87,6 +87,32 @@ export class HomeComponent implements OnInit {
             this.account = account;
         });
         this.registers();
+        this.loop();
+    }
+
+    loop() {
+        this.prognoses.forEach((p) => {
+            if (p.status === 3) {
+                this.prognoseService.find(p.id).subscribe((prognose) => {
+                    try {
+                        console.log(prognose);
+                        if (prognose.status === 4) {
+                            const obj = JSON.parse(prognose.codigo);
+                            const data = JSON.parse(p.resultado);
+                            this.prognoses[data.card].status = 4;
+                            this.prognoses[data.card].codigo = prognose.codigo;
+                            console.log(obj);
+                            if (obj.warning || obj.error) {
+                                console.log(obj.warning);
+                            }
+                        }
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+            }
+        });
+        setTimeout( () => { this.loop(); }, 1000);
     }
 
     registers() {
@@ -97,7 +123,7 @@ export class HomeComponent implements OnInit {
             });
         });
 
-        this.eventManager.subscribe('logout', () =>{
+        this.eventManager.subscribe('logout', () => {
             this.cards = [];
             this.terminais = [];
         });
@@ -117,7 +143,7 @@ export class HomeComponent implements OnInit {
         const atualizar: Card[] = [];
         this.customizeService.getCustomize().subscribe(
             (custom: Customize) => {
-                if(custom && custom.cenario) {
+                if (custom && custom.cenario) {
                     this.homeService.getCards(custom.cenario).subscribe(
                         (cards: Card[][]) => {
                             cards.forEach((cars: Card[], linha: number) => {
@@ -153,6 +179,16 @@ export class HomeComponent implements OnInit {
                                                         terminal.conectar(JSON.parse(card.meta).enderecows);
                                                     }
                                                 });
+                                        }
+
+                                        if (card.modo === 'prognose') {
+                                            this.prognoseService.find(this.getMeta(card).prognose).subscribe( (prognose) => {
+                                                prognose.resultado = '{\"card\":' + card.id +
+                                                    ',\"linha\":' + linha +
+                                                    ',\"coluna\":' + coluna + '}';
+                                                this.prognoses[card.id] = prognose;
+                                                console.log(this.prognoses[card.id]);
+                                            });
                                         }
                                     }
                                 });

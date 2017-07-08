@@ -230,7 +230,7 @@ public class BaseResource {
         @RequestParam("extra") String extra
     ) {
         String codigo;
-        String diretorio = id;
+//        String diretorio = id;
 
         if(nome.endsWith(".csv")) {
             if (!Itgmrest.postBinario(
@@ -260,24 +260,24 @@ public class BaseResource {
 
         Itgmrest.executarBatch(usuario, projeto, "bases", id, codigo);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(5000); ///so pode carregar bases apos este tempo
-                    Itgmrest.removeDIR(
-                        usuario,
-                        projeto,
-                        "*",
-                        "*",
-                        "*-temp/",
-                        "bases/"
-                    );
-                }catch (Exception ex){
-
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(5000); ///so pode carregar bases apos este tempo
+//                    Itgmrest.removeDIR(
+//                        usuario,
+//                        projeto,
+//                        "*",
+//                        "*",
+//                        "*-temp/",
+//                        "bases/"
+//                    );
+//                }catch (Exception ex){
+//
+//                }
+//            }
+//        }).start();
 
 
         return new ResponseEntity<String>(

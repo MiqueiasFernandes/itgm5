@@ -32,6 +32,8 @@ export class MapearModeloComponent implements OnInit {
     }
 
   ngOnInit() {
+        this.modeloExclusivo.nome = this.getNome();
+        this.modeloExclusivo.palpite = this.modeloExclusivo.modelo.palpite;
   }
 
     setModelo(modelo: Modelo) {
@@ -132,6 +134,9 @@ export class MapearModeloComponent implements OnInit {
         this.modeloExclusivoService.create(this.modeloExclusivo).subscribe(() => {
             this.close();
         });
+    }
+    getNome() {
+       return this.modeloExclusivo.modelo ? (this.modeloExclusivo.modelo.nome + 'Exclusivo') : 'modeloExclusivo';
     }
 
 }

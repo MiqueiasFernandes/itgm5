@@ -3,6 +3,8 @@ import { JhiLanguageService } from 'ng-jhipster';
 
 import { Principal, AccountService, JhiLanguageHelper } from '../../shared';
 import {CustomizeService} from '../../entities/customize/customize.service';
+import {UserService} from "../../shared/user/user.service";
+import {ModeloService} from "../../entities/modelo/modelo.service";
 
 @Component({
     selector: 'jhi-settings',
@@ -24,6 +26,8 @@ export class SettingsComponent implements OnInit {
         private languageService: JhiLanguageService,
         private languageHelper: JhiLanguageHelper,
         private customizeService: CustomizeService,
+        private userService: UserService,
+        private modeloService: ModeloService,
     ) {
         this.languageService.setLocations(['settings']);
         this.customizeService.getDesktop().subscribe((desktop) => {
@@ -90,5 +94,11 @@ export class SettingsComponent implements OnInit {
 
     alterarMenu() {
         this.customizeService.setMenuEntidades(this.showMenu = !this.showMenu);
+    }
+
+    addModelos() {
+        this.userService.getUser(this.settingsAccount).subscribe(
+            (user) => this.modeloService.addModelosDaLiteratura(user)
+        );
     }
 }

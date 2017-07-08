@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4 class="modal-title">Assitente de Prognoses</h4>
+    <h4 class="modal-title">Assitente de Prognoses <i class="fa fa-magic"></i></h4>
     <button aria-label="Close" data-dismiss="modal" class="close" type="button" (click)="close()"><span aria-hidden="true">x</span>
     </button>
 </div>
@@ -133,12 +133,13 @@
                             <br>
                             obs.: os modelos devem estar mapeados.
                         </p>
-
+                        <br>
+                        <button class="btn btn-primary" (click)="invertMod()">inverter</button>
+                        <br>
                         Modelos:
-
                         <ul>
                             <li *ngFor="let modelo of modelos">
-                                <input type="checkbox" id="'modelo-' + {{modelo.id}}" (change)="addModelo($event, modelo)">
+                                <input type="checkbox" id="'modelo-' + {{modelo.id}}" (change)="addModelo($event, modelo)" [checked]="chekMod[id]">
                                 <label for="'modelo-' + {{modelo.id}}">{{modelo.nome}} ({{modelo.id}})</label>
                             </li>
                         </ul>
@@ -149,10 +150,12 @@
                         <p>
                             Quais estatisticas serão utilizadas para avaliar os modelos?
                         </p>
-
+                        <br>
+                        <button class="btn btn-primary" (click)="invertEst()">inverter</button>
+                        <br>
                         <ul>
                             <li *ngFor="let estatistica of estatisticasLabel;let id = index">
-                                <input type="checkbox" id="'estat-' + {{id}}" (change)="addEstatistica($event, estatisticas[id])">
+                                <input type="checkbox" id="'estat-' + {{id}}" (change)="addEstatistica($event, estatisticas[id])" [checked]="chekEst[id]">
                                 <label for="'estat-' + {{id}}">{{estatistica}}</label>
                             </li>
                         </ul>
@@ -163,10 +166,12 @@
                         <p>
                             Quais gráficos devem ser gerados?
                         </p>
-
+                        <br>
+                        <button class="btn btn-primary" (click)="invertGraf()">inverter</button>
+                        <br>
                         <ul>
                             <li *ngFor="let estatistica of graficosLabel;let id = index">
-                                <input type="checkbox" id="'graf-' + {{id}}" (change)="addGraficos($event, graficos[id])">
+                                <input type="checkbox" id="'graf-' + {{id}}" (change)="addGraficos($event, graficos[id])"  [checked]="chekGraf[id]">
                                 <label for="'graf-' + {{id}}">{{estatistica}}</label>
                             </li>
                         </ul>
@@ -243,7 +248,12 @@
 
                         <div class="form-group">
                             <label for="nome">Dê um nome a essa prognose:</label>
-                            <input type="text" id="nome" [(ngModel)]="prognose.nome" (click)="verificar()">
+                            <input type="text" id="nome" [(ngModel)]="prognose.nome" (keyup)="verificar()">
+                        </div>
+
+                        <div class="form-group">
+                            <input type="checkbox" [(ngModel)]="removerColSus" id="rem" checked>
+                            <label for="rem">Remover campos suspeitos caso existam na base.</label>
                         </div>
 
                         <textarea class="form-control" [(ngModel)]="prognose.codigo"></textarea>

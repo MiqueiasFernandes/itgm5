@@ -7,6 +7,8 @@ import {Customize, CustomizeService} from '../entities/customize/';
 import {Card, CardService} from '../entities/card';
 import {Cenario} from '../entities/cenario/cenario.model';
 import {Terminal} from '../entities/terminal';
+import {Prognose} from "../entities/prognose/prognose.model";
+import {ModeloExclusivo} from "../entities/modelo-exclusivo/modelo-exclusivo.model";
 
 
 @Injectable()
@@ -17,22 +19,21 @@ export class HomeService {
         private customizeService: CustomizeService,
         private cardService: CardService,
     ) { }
-
-
-    public getCards(cenario: Cenario):Observable<Card[][]> {
-        if(!cenario)
+    public getCards(cenario: Cenario): Observable<Card[][]> {
+        if (!cenario) {
             return Observable.of([]);
+        }
         return this.cardService.getCardsByCenario(cenario)
             .map((cards: Card[]) => this.mapearCards(cards));
     }
 
-    public mapearCards(cards: Card[]):Card[][] {
+    public mapearCards(cards: Card[]): Card[][] {
 
-        let linhas: Card[][] = [];
+        const linhas: Card[][] = [];
 
-        for(let i: number = 0; i < 100 ; i++){
-            let linha: Card[] = cards.filter((card) => card.linha === i);
-            if(linha.length > 0) {
+        for (let i = 0; i < 100 ; i++) {
+            const linha: Card[] = cards.filter((card) => card.linha === i);
+            if (linha.length > 0) {
                 linhas.push(linha.sort((a, b) => a.coluna - b.coluna));
             }
         }
@@ -41,7 +42,7 @@ export class HomeService {
     }
 
     public getAllCards(cards: Card[][]): Card[] {
-        let array = [];
+        const array = [];
 
         cards.forEach((linha: Card[]) => {
             linha.forEach((card: Card) => {
@@ -166,6 +167,7 @@ export class HomeService {
                 return 4;
             case 'rbokeh':
             case 'terminal':
+            case 'prognose':
                 return 6;
             default:
                 return 2;
@@ -232,6 +234,9 @@ export class HomeService {
             case 'terminal':
                 classe += ' terminal';
                 break;
+            case 'prognose':
+                classe += ' prognose';
+                break;
             default:
                 classe += ' meta';
         }
@@ -245,6 +250,7 @@ export class HomeService {
             case 'texto':
             case 'codigo':
             case 'terminal':
+            case 'prognose':
                 return 2;
             case  'planilha':
             case 'rdata':
@@ -288,7 +294,7 @@ export class HomeService {
         const modo = 'terminal';
         const largura: number = this.getTamanhoIdealDeColuna(modo);
         this.customizeService.getCustomize().subscribe(
-            (custom:Customize) => {
+            (custom: Customize) => {
                 if(custom && custom.cenario) {
                     this.getLinhaEColunaIdeal(largura, custom.cenario)
                         .subscribe(
@@ -305,7 +311,7 @@ export class HomeService {
                                     '', // previa
                                     '{\"x\":0,\"y\":0}', // disposicao
                                     this.abreAberto(modo), // tipo - como o card esta aberto: aberto fechado
-                                    tamanho[0],// linha
+                                    tamanho[0], // linha
                                     tamanho[1], // coluna
                                     modo,  // modo = figuram, textom, grafco
                                     custom.cenario.caminho + terminal.nome + '/', // caminho
@@ -329,6 +335,47 @@ export class HomeService {
                 }
             }
         );
+    }
+    openPrognose(prognose: Prognose) {
+        prognose.modeloExclusivos.forEach((modelo: ModeloExclusivo) => {
+            const modo = 'prognose';
+            const largura: number = this.getTamanhoIdealDeColuna(modo);
+            this.getLinhaEColunaIdeal(largura, prognose.cenario)
+                .subscribe(
+                    (tamanho: number[]) => {
+                        this.cardService.create(new Card(
+                            undefined, //     id
+                            prognose.nome + ': ' + modelo.modelo.nome, // nome
+                            prognose.codigo, // url
+                            false, // https
+                            '{\"codigo\":\"' + prognose.codigo +
+                            '\",\"status\":' + prognose.status +
+                            ',\"prognose\":' + prognose.id +
+                            ',\"modelo\":' + modelo.id +
+                            '}', // meta
+                            '', // previa
+                            '{\"x\":0,\"y\":0}', // disposicao
+                            this.abreAberto(modo), // tipo - como o card esta aberto: aberto fechado
+                            tamanho[0], // linha
+                            tamanho[1], // coluna
+                            modo,  // modo = figuram, textom, grafco
+                            prognose.caminho, // caminho
+                            '',  // arquivo
+                            '', // extensao
+                            largura,  // largura
+                            this.getClassePorTipo(modo), // classe
+                            prognose.codigo, // codigo
+                            prognose.cenario // cenario
+                        )).subscribe((card) => {
+                                console.log(card);
+                                this.notificar();
+                            },
+                            (error) => {
+                                alert('houve um erro ao abrir o card: ' + error);
+                            });
+                    }
+                );
+        });
     }
 
     atualizar(card: Card) {

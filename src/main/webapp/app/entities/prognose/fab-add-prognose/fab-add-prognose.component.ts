@@ -34,8 +34,10 @@ export class FabAddPrognoseComponent implements OnInit {
     labeldap2 = 'campo';
     labelht1 = 'campo';
     labelht2 = 'campo';
+    chekMod = [];
+    chekEst = [];
+    chekGraf = [];
     estatisticasLabel = [
-        'MAI',
         'RMSE',
         'BIAS',
         'Bias percentual',
@@ -53,22 +55,21 @@ export class FabAddPrognoseComponent implements OnInit {
         'RRMSE'
     ];
     estatisticas = [
-        'estatisticaMAI',
-        'estatisticaRMSE',
-        'estatisticaBIAS',
-        'estatisticaBiasPERCENTUAL',
-        'estatisticaCE',
-        'estatisticaCORR',
-        'estatisticaCorrPERCENTUAL',
-        'estatisticaCV',
-        'estatisticaCvPERCENTUAL',
-        'estatisticaMAE',
-        'estatisticaR2',
-        'estatisticaResiduoPERCENTUAL',
-        'estatisticaResiduos',
-        'estatisticaRMSE',
-        'estatisticaRmsePERCENTUAL',
-        'estatisticaRRMSE'
+        'estatisticasRMSE',
+        'estatisticasBIAS',
+        'estatisticasBiasPERCENTUAL',
+        'estatisticasCE',
+        'estatisticasCORR',
+        'estatisticasCorrPERCENTUAL',
+        'estatisticasCV',
+        'estatisticasCvPERCENTUAL',
+        'estatisticasMAE',
+        'estatisticasR2',
+        'estatisticasResiduoPERCENTUAL',
+        'estatisticasResiduos',
+        'estatisticasRMSE',
+        'estatisticasRmsePERCENTUAL',
+        'estatisticasRRMSE'
     ];
     graficosLabel = [
         'Graphico ggplot Observado vesrsus Estimado',
@@ -87,6 +88,7 @@ export class FabAddPrognoseComponent implements OnInit {
     bases: Base[] = [];
     modelos: ModeloExclusivo[] = [];
     codigo: Codigo;
+    removerColSus = true;
     constructor(
         public activeModal: NgbActiveModal,
         private customizeService: CustomizeService,
@@ -138,7 +140,6 @@ export class FabAddPrognoseComponent implements OnInit {
             });
         this.prognose.treino = 0.3;
     }
-
     voltar() {
         this.atual = this.etapa = Math.max(this.primeira, --this.etapa);
         this.verificar();
@@ -148,7 +149,7 @@ export class FabAddPrognoseComponent implements OnInit {
         this.atual = this.etapa = this.feito ? Math.min(this.ultima, ++this.etapa) : this.atual;
         this.verificar();
         if (this.etapa > 5) {
-            this.prognose.codigo = this.codigo.resetCodigo().getCodigo(this.prognose);
+            this.prognose.codigo = this.codigo.resetCodigo().getCodigo(this.prognose, this.removerColSus);
         }
     }
 
@@ -185,23 +186,13 @@ export class FabAddPrognoseComponent implements OnInit {
                 this.feito = this.prognose.nome && (this.prognose.nome.length > 1);
                 break;
         }
-        console.log(this.prognose);
-        // 'mg = criaModeloGenerico("basico", "y2~y1+b1+idade1 * idade2", "nlsLM", c("idade1", "idade2"), "b1=0.5", requires = "minpack.lm")'
-        // 'me = criaModeloExclusivo(mg,variaveis = NULL)'
-        // 'configuracao = list();'
-        // 'configuracao$basePredicao = data.frame(dap1 = runif(1000,1,3), dap2 = runif(1000,1,3),ht1 = runif(1000,1,3), ht2 = runif(1000,1,3), idade1 = 48, idade2 = 72)'
-        // 'configuracao$baseProjecao = data.frame(dap1 = runif(300,1,3), dap2 = runif(300,1,3),ht1 = runif(300,1,3), ht2 = runif(300,1,3), idade1 = 72, idade2 = 96)'
-        // 'configuracao$modelos = c(me)'
-        // 'configuracao$estatisticas = list(funcoes = getAllEstatisticsFn())'
-        // 'configuracao$mapeamento = list(dap1 = "dap1", dap2 = "dap2", ht1 = "ht1", ht2 = "ht2")'
-        // 'configuracao$graficos = list(funcoes = getAllGraphicsFn(), vetorial = F)'
-        // 'configuracao$salvar = list(diretorio = "avaliaModeloEspecial/", diretorioDAP = "dap/", diretorioHT = "ht/")'
-        // 'sd = avaliaModeloEspecial(configuracao)'
     }
     enviar() {
+        this.prognose.estatisticas = this.prognose.estatisticas.replace(/estatisticas/g, '');
         this.prognoseService.create(this.prognose).subscribe( (prog) => {
                 alert('Prognose ' + prog.nome + ' criada com sucesso');
                 console.log(prog);
+                this.homeService.openPrognose(prog);
                 this.close();
             },
             (error) => this.onError(error.json())
@@ -290,17 +281,36 @@ export class FabAddPrognoseComponent implements OnInit {
         this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
         this.verificar();
     }
-
     setht1(campo) {
         this.codigo.mapeamento.ht1 =  this.labelht1 = campo;
         this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
         this.verificar();
     }
-
     setht2(campo) {
         this.codigo.mapeamento.ht2 =  this.labelht2 = campo;
         this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
         this.verificar();
+    }
+    invertMod() {
+        if (this.chekMod.length < 1) {
+            this.modelos.forEach( (k, index) => this.chekMod[index] = true);
+            return;
+        }
+        this.chekMod.forEach( (val, index) => this.chekMod[index] = !val);
+    }
+    invertEst() {
+        if (this.chekEst.length < 1) {
+            this.estatisticas.forEach( (k, index) => this.chekEst[index] = true);
+            return;
+        }
+        this.chekEst.forEach( (val, index) => this.chekEst[index] = !val);
+    }
+    invertGraf() {
+        if (this.chekGraf.length < 1) {
+            this.graficos.forEach( (k, index) => this.chekGraf[index] = true);
+            return;
+        }
+        this.chekGraf.forEach( (val, index) => this.chekGraf[index] = !val);
     }
     private onError(error) {
         this.alertService.error(error.message);
@@ -347,9 +357,11 @@ export class Codigo {
     private addModeloExclusivo(modeloEx: ModeloExclusivo) {
         try {
             this.codigo += 'mg' + modeloEx.id + ' = ' + modeloEx.modelo.codigo + '\n' +
-                'me' + modeloEx.id + ' = criaModeloExclusivo(mg' + modeloEx.id +
-                ',variaveis = c(' + modeloEx.mapeamento + ')' +
-                ((modeloEx.palpite && (modeloEx.palpite.length > 1)) ? (', palpite=' + modeloEx.palpite) : '') +
+                'me' + modeloEx.id + ' = mg' + modeloEx.id + '( ' + modeloEx.mapeamento
+                    .split(',')
+                    .map( (str) => str.split('=')[0] + ' = \"' + str.split('=')[1] + '\"' )
+                    .join(', ') +
+                ((modeloEx.palpite && (modeloEx.palpite.length > 1)) ? (', palpite=c(' + modeloEx.palpite +  '))') : ')') +
                 '\n';
             this.modelos = (this.modelos ? (this.modelos + ', ') : '') + 'me' + modeloEx.id;
         } catch (e) {
@@ -357,17 +369,17 @@ export class Codigo {
         }
     }
 
-    getCodigo(prognose: Prognose) {
+    getCodigo(prognose: Prognose, removeCols) {
         try {
             if (this.modo === 1) {
-                this.codigo += 'dftv = separaDados(load(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\"),' +
+                this.codigo += 'dftv = separaDados(get(load(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\")),' +
                     ' \"' + prognose.dividir + '\", percTraining = ' + prognose.treino + ')\n' +
                     'configuracao$basePredicao = dftv$treino\n' +
                     'configuracao$baseProjecao = dftv$validacao\n';
             }
             if (this.modo === 2) {
-                this.codigo += 'configuracao$basePredicao = load(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\")\n' +
-                    'configuracao$baseProjecao = load(\"../../bases/' + prognose.validacao.id + '/' + prognose.validacao.id + '.RData\")\n';
+                this.codigo += 'configuracao$basePredicao = load(get(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\"))\n' +
+                    'configuracao$baseProjecao = load(get(\"../../bases/' + prognose.validacao.id + '/' + prognose.validacao.id + '.RData\"))\n';
             }
             prognose.modeloExclusivos.forEach((modelo) => this.addModeloExclusivo(modelo));
             this.codigo +=
@@ -381,7 +393,8 @@ export class Codigo {
                 'ht2 = "' + this.mapeamento.ht2 + '")\n' +
                 'configuracao$salvar = ' + prognose.salvar + '\n' +
                 'configuracao$fnCalculaVolume = ' + prognose.fncalculavolume + '\n' +
-                'configuracao$forcePredict = ' + prognose.forcepredict + '\n' +
+                'configuracao$forcePredict = ' + (prognose.forcepredict  ? 'TRUE' : 'FALSE') + '\n' +
+                'configuracao$rmColsSuspicious = ' + (removeCols ? 'TRUE' : 'FALSE') + '\n' +
                 'sd = avaliaModeloEspecial(configuracao)';
             return this.codigo;
         } catch (e) {

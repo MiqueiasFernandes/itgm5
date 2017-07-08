@@ -178,7 +178,7 @@
 
                 <div [ngClass]="{
                          'body' : true,
-                          'no-padding': 'figura' === card.modo
+                          'no-padding': (('figura' === card.modo) || ('prognose' === card.modo))
                          }"
                      (click)="closeDropDown()"
                      *ngIf="card.tipo === 2">
@@ -221,6 +221,13 @@
                     <iframe [src]="domSanitizer.bypassSecurityTrustResourceUrl(getURL(card))" *ngSwitchCase="'rbokeh'"></iframe>
 
                     <img [src]="getURL(card)" *ngSwitchCase="'figura'"/>
+
+                    <div *ngSwitchCase="'prognose'">
+                        <img src="../../content/images/spinners.gif" class="load" *ngIf="prognoses[card.id] && (prognoses[card.id].status < 4)">
+
+                        {{prognoses[card.id] ? prognoses[card.id].codigo : ''}}
+
+                    </div>
                 </div>
             </div>
         </div>
