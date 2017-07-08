@@ -277,7 +277,7 @@ export class HomeService {
         return this.cardService.update(card);
     }
 
-    public removeCard(id: number):Observable<boolean> {
+    public removeCard(id: number): Observable<boolean> {
         return this.cardService.delete(id)
             .map(() => {
                 // this.notificar();

@@ -182,13 +182,20 @@ export class HomeComponent implements OnInit {
                                         }
 
                                         if (card.modo === 'prognose') {
-                                            this.prognoseService.find(this.getMeta(card).prognose).subscribe( (prognose) => {
-                                                prognose.resultado = '{\"card\":' + card.id +
-                                                    ',\"linha\":' + linha +
-                                                    ',\"coluna\":' + coluna + '}';
-                                                this.prognoses[card.id] = prognose;
-                                                console.log(this.prognoses[card.id]);
-                                            });
+                                            const meta = this.getMeta(card);
+                                            console.log(meta);
+                                            if (meta && meta.prognose) {
+                                                this.prognoseService.find(meta.prognose).
+                                                subscribe((prognose) => {
+                                                    prognose.resultado = '{\"card\":' + card.id +
+                                                        ',\"linha\":' + linha +
+                                                        ',\"coluna\":' + coluna + '}';
+                                                    this.prognoses[card.id] = prognose;
+                                                    console.log(this.prognoses[card.id]);
+                                                });
+                                            } else {
+                                              console.log('error card ' + card.id + ' nao possui meta valida');
+                                            }
                                         }
                                     }
                                 });
@@ -222,7 +229,7 @@ export class HomeComponent implements OnInit {
     }
 
     getMeta(card: Card): any {
-        if(card && card.meta && card.meta.length > 2) {
+        if (card && card.meta && card.meta.length > 2) {
             try {
                 return JSON.parse(card.meta);
             } catch (e) {

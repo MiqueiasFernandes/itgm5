@@ -57,7 +57,7 @@ public class PrognoseResource {
         }
         Prognose result = prognoseRepository.save(prognose);
 
-        result.setCaminho(prognose.getCenario().getCaminho() + "prognose" + prognose.getId());
+        result.setCaminho(prognose.getCenario().getCaminho() + "prognose" + prognose.getId() + "/");
 
         result.setCodigo(
             Itgmrest.executarBatch(
@@ -93,8 +93,9 @@ public class PrognoseResource {
                             false,
                             "{}"
                         ));
+                        prognose1.setResultado(token);
                         rodando = false;
-                    }else{
+                    } else {
                         prognose1.setStatus(4);
                         prognose1.setCodigo(status);
                     }
