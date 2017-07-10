@@ -79,6 +79,12 @@ public class PrognoseResourceIntTest {
     private static final String DEFAULT_RESULTADO = "AAAAAAAAAA";
     private static final String UPDATED_RESULTADO = "BBBBBBBBBB";
 
+    private static final String DEFAULT_TOKEN = "AAAAAAAAAA";
+    private static final String UPDATED_TOKEN = "BBBBBBBBBB";
+
+    private static final String DEFAULT_RELATORIO = "AAAAAAAAAA";
+    private static final String UPDATED_RELATORIO = "BBBBBBBBBB";
+
     @Autowired
     private PrognoseRepository prognoseRepository;
 
@@ -129,7 +135,9 @@ public class PrognoseResourceIntTest {
             .fncalculavolume(DEFAULT_FNCALCULAVOLUME)
             .status(DEFAULT_STATUS)
             .codigo(DEFAULT_CODIGO)
-            .resultado(DEFAULT_RESULTADO);
+            .resultado(DEFAULT_RESULTADO)
+            .token(DEFAULT_TOKEN)
+            .relatorio(DEFAULT_RELATORIO);
         return prognose;
     }
 
@@ -167,6 +175,8 @@ public class PrognoseResourceIntTest {
         assertThat(testPrognose.getStatus()).isEqualTo(DEFAULT_STATUS);
         assertThat(testPrognose.getCodigo()).isEqualTo(DEFAULT_CODIGO);
         assertThat(testPrognose.getResultado()).isEqualTo(DEFAULT_RESULTADO);
+        assertThat(testPrognose.getToken()).isEqualTo(DEFAULT_TOKEN);
+        assertThat(testPrognose.getRelatorio()).isEqualTo(DEFAULT_RELATORIO);
     }
 
     @Test
@@ -212,7 +222,9 @@ public class PrognoseResourceIntTest {
             .andExpect(jsonPath("$.[*].fncalculavolume").value(hasItem(DEFAULT_FNCALCULAVOLUME.toString())))
             .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
             .andExpect(jsonPath("$.[*].codigo").value(hasItem(DEFAULT_CODIGO.toString())))
-            .andExpect(jsonPath("$.[*].resultado").value(hasItem(DEFAULT_RESULTADO.toString())));
+            .andExpect(jsonPath("$.[*].resultado").value(hasItem(DEFAULT_RESULTADO.toString())))
+            .andExpect(jsonPath("$.[*].token").value(hasItem(DEFAULT_TOKEN.toString())))
+            .andExpect(jsonPath("$.[*].relatorio").value(hasItem(DEFAULT_RELATORIO.toString())));
     }
 
     @Test
@@ -239,7 +251,9 @@ public class PrognoseResourceIntTest {
             .andExpect(jsonPath("$.fncalculavolume").value(DEFAULT_FNCALCULAVOLUME.toString()))
             .andExpect(jsonPath("$.status").value(DEFAULT_STATUS))
             .andExpect(jsonPath("$.codigo").value(DEFAULT_CODIGO.toString()))
-            .andExpect(jsonPath("$.resultado").value(DEFAULT_RESULTADO.toString()));
+            .andExpect(jsonPath("$.resultado").value(DEFAULT_RESULTADO.toString()))
+            .andExpect(jsonPath("$.token").value(DEFAULT_TOKEN.toString()))
+            .andExpect(jsonPath("$.relatorio").value(DEFAULT_RELATORIO.toString()));
     }
 
     @Test
@@ -273,7 +287,9 @@ public class PrognoseResourceIntTest {
             .fncalculavolume(UPDATED_FNCALCULAVOLUME)
             .status(UPDATED_STATUS)
             .codigo(UPDATED_CODIGO)
-            .resultado(UPDATED_RESULTADO);
+            .resultado(UPDATED_RESULTADO)
+            .token(UPDATED_TOKEN)
+            .relatorio(UPDATED_RELATORIO);
 
         restPrognoseMockMvc.perform(put("/api/prognoses")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -298,6 +314,8 @@ public class PrognoseResourceIntTest {
         assertThat(testPrognose.getStatus()).isEqualTo(UPDATED_STATUS);
         assertThat(testPrognose.getCodigo()).isEqualTo(UPDATED_CODIGO);
         assertThat(testPrognose.getResultado()).isEqualTo(UPDATED_RESULTADO);
+        assertThat(testPrognose.getToken()).isEqualTo(UPDATED_TOKEN);
+        assertThat(testPrognose.getRelatorio()).isEqualTo(UPDATED_RELATORIO);
     }
 
     @Test

@@ -121,6 +121,7 @@ export class CustomizeService {
                                 this.create(newCustomize).subscribe(
                                     (customizem: Customize) => {
                                         alert('Sessão personalizada...');
+                                        alert('Atenção você precisa acessar < https://itgm.mikeias.net:8099/ > com sucesso')
                                         this.eventManager
                                             .broadcast({
                                                 name: 'customizeListModification',

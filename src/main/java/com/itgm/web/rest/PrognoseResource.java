@@ -1,6 +1,7 @@
 package com.itgm.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.itgm.domain.ModeloExclusivo;
 import com.itgm.domain.Prognose;
 
 import com.itgm.repository.PrognoseRepository;
@@ -21,8 +22,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
+import java.util.function.Predicate;
 
 /**
  * REST controller for managing Prognose.
@@ -59,7 +63,7 @@ public class PrognoseResource {
 
         result.setCaminho(prognose.getCenario().getCaminho() + "prognose" + prognose.getId() + "/");
 
-        result.setCodigo(
+        result.setToken(
             Itgmrest.executarBatch(
                 prognose.getCenario().getProjeto().getUser().getLogin(),
                 prognose.getCenario().getProjeto().getNome(),
@@ -76,37 +80,107 @@ public class PrognoseResource {
             @Override
             public void run() {
                 Prognose prognose1 = prog;
-                final String token = prog.getCodigo();
-                boolean rodando = true;
-                do {
-                    ////obter status
-                    String status = Itgmrest.getStatus(token);
-                    if (status.startsWith("{\"error\":\"processo n") && status.endsWith("encontrado\"}")) {
-                        prognose1.setStatus(4);
-                        prognose1.setCodigo(Itgmrest.getContent(
-                            prognose1.getCenario().getProjeto().getUser().getLogin(),
-                            prognose1.getCenario().getProjeto().getNome(),
-                            prognose1.getCenario().getNome(),
-                            "prognose" + prognose.getId(),
-                            "relatorio.avaliaModeloEspecial.json",
-                            null,
-                            false,
-                            "{}"
-                        ));
-                        prognose1.setResultado(token);
-                        rodando = false;
-                    } else {
-                        prognose1.setStatus(4);
-                        prognose1.setCodigo(status);
+                try{
+                    boolean rodando = true;
+                    String usuario =  prognose1.getCenario().getProjeto().getUser().getLogin();
+                    String projeto = prognose1.getCenario().getProjeto().getNome();
+                    String cenario =  prognose1.getCenario().getNome();
+                    String diretorio = "prognose" + prognose.getId();
+                    do {
+                        try {
+                            Thread.sleep(10000);
+                        } catch (Exception e) {
+                            rodando = false;
+                        }
+
+                        String status = Itgmrest.getStatus(prognose1.getToken());
+                        if (status.startsWith("{\"error\":\"processo n") && status.endsWith("encontrado\"}")) {
+                            prognose1.setStatus(4);
+                            String relatorio = Itgmrest.getContent(
+                                usuario,
+                                projeto,
+                                cenario,
+                                diretorio,
+                                "relatorio.avaliaModeloEspecial.json",
+                                null,
+                                false,
+                                "{}"
+                            );
+
+                            String[] modelos =  Itgmrest.getContent(
+                                usuario,
+                                projeto,
+                                cenario,
+                                diretorio,
+                                "comparativo ( VOLUME ) da VALIDACAO dos modelos - estatistica dos modelos.csv",
+                                "resultados/",
+                                false,
+                                "\n"
+                            ).split("\n")[0]
+                                .replaceAll("\"", "")
+                                .replace(",name,", "")
+                                .replaceAll("value_", "")
+                                .split(",");
+
+                            StringBuilder sb = new StringBuilder("{");
+
+                            for (ModeloExclusivo me : prognose1.getModeloExclusivos()) {
+
+                                sb.append("{".equals(sb.toString()) ? "" : ",");
+                                sb.append("\"" + me.getModelo().getNome() + "\":{");
+
+                                String equivalente = me.getModelo().getNome().replaceAll("\\s", "");
+                                if (Arrays.stream(modelos).anyMatch(new Predicate<String>() {
+                                    @Override
+                                    public boolean test(String s) {
+                                        return s.equals(equivalente);
+                                    }
+                                })){
+                                    ///obter grafico principal de ajuste e validacao
+                                    sb.append("\"alias\":\"").append(equivalente).append("\"");
+                                    sb.append(getResultados(true,usuario,projeto,cenario,diretorio,equivalente));
+                                    sb.append(getResultados(false,usuario,projeto,cenario,diretorio,equivalente));
+                                } else {
+                                    sb.append("\"error\":\"o modelo " + me.getModelo().getNome() +
+                                        " (" + equivalente + ") não foi encontrado entre os " +
+                                        "modelos {" + Arrays.toString(modelos) + "}, " +
+                                        "algum erro crítico ocorreu.\"");
+                                }
+
+                                sb.append("}");
+
+                            }
+                            sb.append("}");
+
+                            prognose1
+                                .setRelatorio("{\"relatorio\":" + relatorio + "," +
+                                    "\"resultados\":" + sb.toString() + "}");
+
+                            rodando = false;
+                        } else {
+                            prognose1.setStatus(3);
+                            prognose1.setRelatorio(status);
+                        }
+                        try {
+                            prognoseRepository.save(prognose1);
+                        }catch (Exception ex) {
+                            prognose1.setRelatorio("{\"relatorio\":{\"error\":\"" +
+                                ex.toString()
+                                    .replaceAll("\\s", " ")
+                                    .replaceAll("\"", "").substring(0, Math.min(200, ex.toString().length())) + "\"}}");
+                            prognose1.setStatus(4);
+                            prognoseRepository.save(prognose1);
+                        }
                     }
+                    while (rodando);
+                } catch (Exception e) {
+                    prognose1.setRelatorio("{\"relatorio\":{\"error\":\"" +
+                        e.toString()
+                            .replaceAll("\\s", " ")
+                            .replaceAll("\"", "").substring(0, Math.min(200, e.toString().length())) + "\"}}");
+                    prognose1.setStatus(4);
                     prognoseRepository.save(prognose1);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                        rodando = false;
-                    }
                 }
-                while (rodando);
             }
         }).start();
 
@@ -147,7 +221,7 @@ public class PrognoseResource {
     @Timed
     public ResponseEntity<List<Prognose>> getAllPrognoses(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Prognoses");
-        Page<Prognose> page = prognoseRepository.findByUserIsCurrentUser(pageable);
+        Page<Prognose> page = prognoseRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/prognoses");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -176,8 +250,80 @@ public class PrognoseResource {
     @Timed
     public ResponseEntity<Void> deletePrognose(@PathVariable Long id) {
         log.debug("REST request to delete Prognose : {}", id);
+        Prognose prognose = prognoseRepository.findOneWithEagerRelationships(id);
+        Itgmrest.removeDIR(
+            prognose.getCenario().getProjeto().getUser().getLogin(),
+            prognose.getCenario().getProjeto().getNome(),
+            prognose.getCenario().getNome(),
+            "prognose" + prognose.getId(),
+            null,
+            null);
         prognoseRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    String getResultados(boolean metodo,
+                         String usuario,
+                         String projeto,
+                         String cenario,
+                         String diretorio,
+                         String equivalente) {
+        StringBuilder sb = new StringBuilder(",\"" + (metodo ? "ajuste" : "validacao") + "\":{");
+        sb.append("\"grafico\":\"")
+            .append( Itgmrest.publicFile(
+                usuario,
+                projeto,
+                cenario,
+                diretorio,
+                "resultados/" + equivalente + "/"  + (metodo ? "" : "validacao/"),
+                equivalente + " Volume " + (metodo ? "Ajuste" : "Validacao") + ".png",
+                false,
+                true))
+            .append("\"");
+        String arquivo = Itgmrest.getContent(
+            usuario,
+            projeto,
+            cenario,
+            diretorio,
+            (metodo ? "ajuste" : "validacao") + " Volume " + equivalente + " - estatisticas do modelo.csv",
+            "resultados/" + equivalente + "/"  + (metodo ? "" : "validacao/"),
+            false,
+            "");
+        if (arquivo != null && !arquivo.isEmpty() && (arquivo.length() > 10)){
+            sb.append(",\"estatisticas\":{");
+            arquivo = arquivo.replace("\"name\",\"value\"\n", "");
+            arquivo = arquivo.replaceAll(",", ":");
+            arquivo = arquivo.replaceAll("\n", ",");
+            arquivo = arquivo.substring(0, arquivo.length()-1);
+            sb.append(arquivo).append("}");
+        }
+
+        sb.append(",\"estatisticas2\":\"")
+            .append(Itgmrest.publicFile(
+                usuario,
+                projeto,
+                cenario,
+                diretorio,
+                "resultados/" + equivalente + "/"  + (metodo ? "" : "validacao/"),
+                (metodo ? "ajuste" : "validacao") + " Volume " + equivalente + " - estatisticas.csv",
+                false,
+                false))
+            .append("\"");
+
+        sb.append(",\"coeficientes\":\"")
+            .append(Itgmrest.publicFile(
+                usuario,
+                projeto,
+                cenario,
+                diretorio,
+                "resultados/" + equivalente + "/"  + (metodo ? "" : "validacao/"),
+                (metodo ? "ajuste" : "validacao") + " Volume " + equivalente + " - coeficientes.csv",
+                false,
+                false))
+            .append("\"");
+        sb.append("}");
+        return sb.toString();
+    }
+
 
 }

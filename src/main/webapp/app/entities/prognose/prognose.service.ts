@@ -3,6 +3,7 @@ import { Http, Response, URLSearchParams, BaseRequestOptions } from '@angular/ht
 import { Observable } from 'rxjs/Rx';
 
 import { Prognose } from './prognose.model';
+import {Cenario} from "../cenario/cenario.model";
 @Injectable()
 export class PrognoseService {
 
@@ -11,8 +12,6 @@ export class PrognoseService {
     constructor(private http: Http) { }
 
     create(prognose: Prognose): Observable<Prognose> {
-        console.log('enviando prognose');
-        console.log(prognose);
         const copy: Prognose = Object.assign({}, prognose);
         return this.http.post(this.resourceUrl, copy).map((res: Response) => {
             return res.json();
@@ -55,5 +54,11 @@ export class PrognoseService {
             options.search = params;
         }
         return options;
+    }
+    getPrognosesByCenario(cenario: Cenario): Observable<Prognose[]> {
+        if (!cenario) {
+            return Observable.of([]);
+        }
+        return this.query().map( (res) => res.json().filter((prognose) => prognose.cenario.id === cenario.id ) );
     }
 }

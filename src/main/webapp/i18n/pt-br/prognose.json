@@ -29,6 +29,8 @@
             "status": "Status",
             "codigo": "Codigo",
             "resultado": "Resultado",
+            "token": "Token",
+            "relatorio": "Relatorio",
             "ajuste": "Ajuste",
             "validacao": "Validacao",
             "modeloExclusivo": "Modelo Exclusivo",

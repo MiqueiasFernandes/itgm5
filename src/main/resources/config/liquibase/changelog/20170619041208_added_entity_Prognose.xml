@@ -70,11 +70,19 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="codigo" type="varchar(60000)">
+            <column name="codigo" type="varchar(40000)">
                 <constraints nullable="true" />
             </column>
 
             <column name="resultado" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="token" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
+            <column name="relatorio" type="varchar(20000)">
                 <constraints nullable="true" />
             </column>
 

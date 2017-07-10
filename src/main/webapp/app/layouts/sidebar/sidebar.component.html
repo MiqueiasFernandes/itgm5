@@ -105,13 +105,162 @@
             </li>
 
             <li *ngIf="cenario !== null && cenario !== undefined" class="nivel1" (click)="novaPrognose()">
-               Nova Prognose
+                Nova Prognose
+            </li>
+
+            <li *ngIf="cenario !== null && cenario !== undefined"
+                [ngClass]="{'nivel1': true, 'ativo': isResultadosOpen}">
+                <div (click)="mostrarResultados()">
+                    Resultados
+                    <i [ngClass]="{
+                         'fa' : true,
+                         'right': true,
+                         'fa-chevron-up' : isResultadosOpen,
+                         'fa-chevron-down' : !isResultadosOpen
+                         }" aria-hidden="true"></i>
+                </div>
+                <ul class="nivel2">
+                    <li *ngFor="let prognose of prognoses" (click)="loadPrognose($event,prognose)">
+                        {{prognose.nome}}
+                        <ul *ngIf="lista[0] === prognose.id">
+                            <li *ngFor="let modelo of prognose.modeloExclusivos" (click)="setLocal($event,1,modelo.id)">
+                                {{modelo.nome}}
+                                <ul *ngIf="lista[1] === modelo.id">
+                                    <li (click)="setLocal($event,2,1)">
+                                        Ajuste
+                                        <ul *ngIf="lista[2] === 1">
+                                            <li (click)="setLocal($event,3,1)">DAP
+                                                <ul  *ngIf="lista[3] === 1">
+                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                        <ul *ngIf="lista[4] === 1">
+                                                            <li>stat 1</li>
+                                                            <li>stat 2</li>
+                                                            <li>stat 3</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                        <ul *ngIf="lista[4] === 2">
+                                                            <li>ObservadoXEstimado</li>
+                                                            <li>Resíduo Absoluto</li>
+                                                            <li>Resíduo Percentual</li>
+                                                            <li>Histograma de Resíduos</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li (click)="setLocal($event,3,2)">HT
+                                                <ul  *ngIf="lista[3] === 2">
+                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                        <ul *ngIf="lista[4] === 1">
+                                                            <li>stat 1</li>
+                                                            <li>stat 2</li>
+                                                            <li>stat 3</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                        <ul *ngIf="lista[4] === 2">
+                                                            <li>ObservadoXEstimado</li>
+                                                            <li>Resíduo Absoluto</li>
+                                                            <li>Resíduo Percentual</li>
+                                                            <li>Histograma de Resíduos</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li (click)="setLocal($event,3,3)">Volume Total
+                                                <ul  *ngIf="lista[3] === 3">
+                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                        <ul *ngIf="lista[4] === 1">
+                                                            <li>stat 1</li>
+                                                            <li>stat 2</li>
+                                                            <li>stat 3</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                        <ul *ngIf="lista[4] === 2">
+                                                            <li>ObservadoXEstimado</li>
+                                                            <li>Resíduo Absoluto</li>
+                                                            <li>Resíduo Percentual</li>
+                                                            <li>Histograma de Resíduos</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li (click)="setLocal($event,2,2)">
+                                        Validação
+                                        <ul *ngIf="lista[2] === 2">
+                                            <li (click)="setLocal($event,3,1)">DAP
+                                                <ul  *ngIf="lista[3] === 1">
+                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                        <ul *ngIf="lista[4] === 1">
+                                                            <li>stat 1</li>
+                                                            <li>stat 2</li>
+                                                            <li>stat 3</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                        <ul *ngIf="lista[4] === 2">
+                                                            <li>ObservadoXEstimado</li>
+                                                            <li>Resíduo Absoluto</li>
+                                                            <li>Resíduo Percentual</li>
+                                                            <li>Histograma de Resíduos</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li (click)="setLocal($event,3,2)">HT
+                                                <ul  *ngIf="lista[3] === 2">
+                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                        <ul *ngIf="lista[4] === 1">
+                                                            <li>stat 1</li>
+                                                            <li>stat 2</li>
+                                                            <li>stat 3</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                        <ul *ngIf="lista[4] === 2">
+                                                            <li>ObservadoXEstimado</li>
+                                                            <li>Resíduo Absoluto</li>
+                                                            <li>Resíduo Percentual</li>
+                                                            <li>Histograma de Resíduos</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li (click)="setLocal($event,3,3)">Volume Total
+                                                <ul  *ngIf="lista[3] === 3">
+                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                        <ul *ngIf="lista[4] === 1">
+                                                            <li>stat 1</li>
+                                                            <li>stat 2</li>
+                                                            <li>stat 3</li>
+                                                        </ul>
+                                                    </li>
+                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                        <ul *ngIf="lista[4] === 2">
+                                                            <li>ObservadoXEstimado</li>
+                                                            <li>Resíduo Absoluto</li>
+                                                            <li>Resíduo Percentual</li>
+                                                            <li>Histograma de Resíduos</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </li>
 
             <li *ngIf="cenario !== null && cenario !== undefined"
                 [ngClass]="{'nivel1': true, 'ativo': isArquivosOpen}">
                 <div (click)="listar()">
-                    Resultados <i *ngIf="loadArquivos" class="fa fa-spinner fa-pulse fa-fw"></i>
+                    Arquivos <i *ngIf="loadArquivos" class="fa fa-spinner fa-pulse fa-fw"></i>
                     <i [ngClass]="{
                          'fa' : true,
                          'right': true,

@@ -31,6 +31,8 @@
             <th jhiSortBy="status"><span jhiTranslate="itgmApp.prognose.status">Status</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="codigo"><span jhiTranslate="itgmApp.prognose.codigo">Codigo</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="resultado"><span jhiTranslate="itgmApp.prognose.resultado">Resultado</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="token"><span jhiTranslate="itgmApp.prognose.token">Token</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="relatorio"><span jhiTranslate="itgmApp.prognose.relatorio">Relatorio</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="ajuste.id"><span jhiTranslate="itgmApp.prognose.ajuste">Ajuste</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="validacao.id"><span jhiTranslate="itgmApp.prognose.validacao">Validacao</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="cenario.id"><span jhiTranslate="itgmApp.prognose.cenario">Cenario</span> <span class="fa fa-sort"></span></th>
@@ -54,6 +56,8 @@
                 <td>{{prognose.status}}</td>
                 <td>{{prognose.codigo}}</td>
                 <td>{{prognose.resultado}}</td>
+                <td>{{prognose.token}}</td>
+                <td>{{prognose.relatorio}}</td>
                 <td>
                     <div *ngIf="prognose.ajuste">
                         <a [routerLink]="['../base', prognose.ajuste?.id ]" >{{prognose.ajuste?.id}}</a>

@@ -1,4 +1,7 @@
 
+.dropdown-menu {
+    cursor: pointer;
+}
 
 
 .load {
@@ -11,6 +14,44 @@
 }
 
 
+.esquerdo {
+    float: left;
+    width: 50%;
+    margin: 0.2%;
+    padding: 0.8%;
+    padding-right: 1.2%;
+    border-right: 1px solid #f0f0f0;
+}
+
+.direito {
+    float: right;
+    width: 49%;
+    margin: 0.2%;
+    padding: 0.8%;
+}
+
+.esquerdo h2, .direito h2 {
+    text-align: center;
+}
+.esquerdo h4, .direito h4 {
+    margin: 20px;
+}
+
+.relatorio {
+    font-size: xx-small;
+    margin: 10px;
+    background-color: #F0F0F0;
+    padding: 5px;
+    float: left;
+}
+
+.war {
+    color: orange;
+}
+.err {
+    color: red;
+    font-weight: bold;
+}
 
 
 .terminal > div.body {

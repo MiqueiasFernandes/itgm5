@@ -18,6 +18,8 @@ export class Prognose {
         public status?: number,
         public codigo?: string,
         public resultado?: string,
+        public token?: string,
+        public relatorio?: string,
         public ajuste?: Base,
         public validacao?: Base,
         public modeloExclusivo?: ModeloExclusivo,

@@ -1,9 +1,9 @@
 import {Component, ElementRef, OnInit, AfterViewInit} from '@angular/core';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EventManager, JhiLanguageService } from 'ng-jhipster';
-import {DomSanitizer} from '@angular/platform-browser';
 
-///https://www.npmjs.com/package/angular2-highlight-js
+import { EventManager, JhiLanguageService } from 'ng-jhipster';
+// import {DomSanitizer} from '@angular/platform-browser';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+/// https://www.npmjs.com/package/angular2-highlight-js
 // import { HighlightJsModule, HighlightJsService } from 'angular2-highlight-js';
 
 import { Account, LoginModalService, Principal } from '../shared';
@@ -28,6 +28,9 @@ import {Observable} from "rxjs/Observable";
 import {TerminalService} from "../entities/terminal/terminal.service";
 import {Prognose} from "../entities/prognose/prognose.model";
 import {PrognoseService} from "../entities/prognose/prognose.service";
+import {ModeloService} from "../entities/modelo/modelo.service";
+import {Modelo} from "../entities/modelo/modelo.model";
+import {FabAddPrognoseComponent} from "../entities/prognose/fab-add-prognose/fab-add-prognose.component";
 
 @Component({
     selector: 'jhi-home',
@@ -66,6 +69,8 @@ export class HomeComponent implements OnInit {
     transitions = [];
     terminais: Terminal[] = [];
     prognoses: Prognose[] = [];
+    prognoses2: Prognose[] = [];
+    modelos: Modelo[] = [];
 
     constructor(
         private jhiLanguageService: JhiLanguageService,
@@ -75,8 +80,8 @@ export class HomeComponent implements OnInit {
         private homeService: HomeService,
         private customizeService: CustomizeService,
         private prognoseService: PrognoseService,
-        // private domSanitizer: DomSanitizer,
         private terminalService: TerminalService,
+        private modalService: NgbModal,
     ) {
         this.jhiLanguageService.setLocations(['home']);
         this.windowRef = homeService.getNativeWnidow();
@@ -91,20 +96,14 @@ export class HomeComponent implements OnInit {
     }
 
     loop() {
-        this.prognoses.forEach((p) => {
-            if (p.status === 3) {
-                this.prognoseService.find(p.id).subscribe((prognose) => {
+        this.prognoses.forEach((p, i) => {
+            if (p.status < 4) { ///se rodando verificar se terminou
+                console.log('requisitar prognose...')
+                this.prognoseService.find(p.id).subscribe( (prognose) => {
                     try {
-                        console.log(prognose);
-                        if (prognose.status === 4) {
-                            const obj = JSON.parse(prognose.codigo);
-                            const data = JSON.parse(p.resultado);
-                            this.prognoses[data.card].status = 4;
-                            this.prognoses[data.card].codigo = prognose.codigo;
-                            console.log(obj);
-                            if (obj.warning || obj.error) {
-                                console.log(obj.warning);
-                            }
+                        if (prognose.status === 4) {   ///terminou!
+                            p.resultado.split(',').forEach( (id) => { this.prognoses2[id] = prognose; } );
+                            this.prognoses.splice(i, 1);
                         }
                     } catch (e) {
                         console.log(e);
@@ -112,7 +111,70 @@ export class HomeComponent implements OnInit {
                 });
             }
         });
-        setTimeout( () => { this.loop(); }, 1000);
+        setTimeout( () => { this.loop(); }, 10000);
+    }
+    getResultados(card, val: boolean) {
+        let obj: any;
+        try {
+            obj = JSON.parse(
+                this.prognoses2[card.id].relatorio)
+                .resultados[this.modelos[this.getMeta(card).modelo].nome];
+        } catch (e) {
+            console.log(e);
+            return {};
+        }
+        return val ? (obj.ajuste ? obj.ajuste : {}) : (obj.validacao ? obj.validacao : {});
+    }
+    getGrafico(card, ajuste) {
+        const res = this.getResultados(card, ajuste);
+        if (res.grafico) {
+            return res.grafico;
+        }
+        return 'grafico.png';
+    }
+    getEstatisticas(card, ajuste) {
+        let obj = {
+            bias: undefined,
+            biasPERCENTUAL: undefined,
+            ce: undefined,
+            corr: undefined,
+            corr_PERCENTUAL: undefined,
+            cv: undefined,
+            cvPERCENTUAL: undefined,
+            mae: undefined,
+            r2: undefined,
+            rmse: undefined,
+            rmsePERCENTUAL: undefined,
+            rrmse: undefined
+        };
+        try {
+            obj = Object.assign(obj, this.getResultados(card, ajuste).estatisticas);
+        } catch (e) {
+            console.log(e);
+        }
+       return obj;
+    }
+    getWarning(card) {
+        try {
+            return JSON.parse(this.prognoses2[card.id].relatorio).relatorio.warning;
+        } catch (e) {
+            console.log(e);
+            return '';
+        }
+    }
+    getError(card) {
+        try {
+            const obj = JSON.parse(this.prognoses2[card.id].relatorio);
+            // console.log(obj);
+            const error =  obj.resultados[
+                this.modelos[this.getMeta(card).modelo].nome
+                ].error;
+            return (obj.relatorio.error ? obj.relatorio.error  + '; ' : '') +
+                (error ? error : '') + (obj.error ? ('; ' + obj.error) : '');
+        } catch (e) {
+            console.log(e);
+            return '';
+        }
     }
 
     registers() {
@@ -182,19 +244,29 @@ export class HomeComponent implements OnInit {
                                         }
 
                                         if (card.modo === 'prognose') {
-                                            const meta = this.getMeta(card);
-                                            console.log(meta);
-                                            if (meta && meta.prognose) {
-                                                this.prognoseService.find(meta.prognose).
-                                                subscribe((prognose) => {
-                                                    prognose.resultado = '{\"card\":' + card.id +
-                                                        ',\"linha\":' + linha +
-                                                        ',\"coluna\":' + coluna + '}';
-                                                    this.prognoses[card.id] = prognose;
-                                                    console.log(this.prognoses[card.id]);
-                                                });
+                                            const meta2 = this.getMeta(card);
+                                            if (meta2 && meta2.prognose) {
+                                                const index = this.prognoses
+                                                    .findIndex((p) => p.id === meta2.prognose);
+                                                if (index >= 0) {
+                                                    this.prognoses[index].resultado += (',' + card.id);
+                                                } else {
+                                                    this.prognoseService.find(meta2.prognose).
+                                                    subscribe((prognose) => {
+                                                        prognose.modeloExclusivos.forEach( (me) => {
+                                                            this.modelos[me.id] = me.modelo;
+                                                        });
+                                                        if (prognose.status < 4) {
+                                                            prognose.resultado = (card.id + '');
+                                                            this.prognoses.push(prognose);
+                                                        } else {
+                                                            this.prognoses2[card.id] = prognose;
+                                                        }
+                                                    });
+                                                }
+
                                             } else {
-                                              console.log('error card ' + card.id + ' nao possui meta valida');
+                                                console.log('error card ' + card.id + ' nao possui meta valida');
                                             }
                                         }
                                     }
@@ -211,12 +283,12 @@ export class HomeComponent implements OnInit {
             }
         );
 
-        atualizar.forEach(card => this.homeService.atualizar(card));
+        atualizar.forEach( (card) => this.homeService.atualizar(card));
 
     }
 
 
-    getTerminal(id: number):Observable<Terminal> {
+    getTerminal(id: number): Observable<Terminal> {
         return this.terminalService.find(id);
     }
 
@@ -239,7 +311,7 @@ export class HomeComponent implements OnInit {
         return {};
     }
 
-    getSize(card: Card):string {
+    getSize(card: Card): string {
         const meta = this.getMeta(card);
         let tam = -1;
         if (meta) {
@@ -269,11 +341,11 @@ export class HomeComponent implements OnInit {
         }
     }
 
-    isResize(card: Card):boolean {
+    isResize(card: Card): boolean {
         return ['figura', 'rbokeh', 'texto', 'codigo'].indexOf(card.modo) >= 0;
     }
 
-    getPrevia(text: string):string {
+    getPrevia(text: string): string {
         return '<code>' +
             this.homeService
                 .getNativeWnidow()
@@ -281,13 +353,18 @@ export class HomeComponent implements OnInit {
                 .join('</code><br><code>') + '</code>';
     }
 
-    isArquivo(card: Card):boolean {
-        return ['figura','rbokeh','texto','codigo','planilha','rdata'].indexOf(card.modo) >= 0;
+    isArquivo(card: Card): boolean {
+        return [ 'figura', 'rbokeh', 'texto', 'codigo', 'planilha', 'rdata' ].indexOf(card.modo) >= 0;
+    }
+    duplicar(card: Card) {
+        const ref = this.modalService.open(FabAddPrognoseComponent, {size: 'lg'});
+        ref.componentInstance.setPrognose(this.prognoses2[card.id]);
+        this.closeDropDown();
     }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-    isDestacavel(card: Card):boolean {
+    isDestacavel(card: Card): boolean {
         return ['figura', 'rbokeh', 'planilha', 'texto', 'codigo'].indexOf(card.modo) >= 0;
     }
 
@@ -304,8 +381,8 @@ export class HomeComponent implements OnInit {
             'resizable=yes,' +
             'top=' + (rect.top + 100) + ',' +
             'left=' + rect.left + ',' +
-            'height=' + (card.modo === 'figura' && meta !== null ? meta.height: '500') + ',' +
-            'width=' + (card.modo === 'figura' && meta !== null ? meta.width: '500')  + ',' +
+            'height=' + (card.modo === 'figura' && meta !== null ? meta.height : '500') + ',' +
+            'width=' + (card.modo === 'figura' && meta !== null ? meta.width : '500')  + ',' +
             'scrollbars=yes,' +
             'status=yes');
         switch (card.modo){
@@ -333,11 +410,11 @@ export class HomeComponent implements OnInit {
                         <script>$("#CSVTable").CSVToTable("url",{loadingImage:"imagemgif",startLine:0});</script>
                         </html>`;
 
-                //não se esqueça de atribuir:
-                //<Directory "/var/www/html/temp">
-                //Header set Access-Control-Allow-Origin "*"
-                //</Directory>
-                myWindow.document.write(html.replace('url', url).replace('imagemgif', this.getMeta(card).endereco/*.replace('http:', 'https:').replace(':80', '')*/ + 'loading.gif'));
+                // não se esqueça de atribuir:
+                // <Directory "/var/www/html/temp">
+                // Header set Access-Control-Allow-Origin "*"
+                // </Directory>
+                myWindow.document.write(html.replace('url', url).replace('imagemgif', this.getMeta(card).endereco + 'loading.gif'));
                 break;
             case 'rdata':
             case 'texto':
@@ -355,15 +432,15 @@ export class HomeComponent implements OnInit {
     }
 
     reduzir(card: Card) {
-        this.homeService.reduzirCard(card).subscribe((card: Card)=>{
-            this.cards[card.linha][card.coluna] = card;
+        this.homeService.reduzirCard(card).subscribe( (card2: Card) =>{
+            this.cards[card2.linha][card2.coluna] = card2;
         });
         this.closeDropDown();
     }
 
     ampliar(card: Card) {
-        this.homeService.ampliarCard(card).subscribe((card: Card)=>{
-            this.cards[card.linha][card.coluna] = card;
+        this.homeService.ampliarCard(card).subscribe( (card2: Card) =>{
+            this.cards[card2.linha][card2.coluna] = card2;
         });
         this.closeDropDown();
     }
@@ -379,7 +456,7 @@ export class HomeComponent implements OnInit {
 ///////////////////////////////////////////////////////////////////////////////
 
     animationDone($event: any, card: Card) {
-        if($event.fromState === 'in' && $event.toState === 'out' && card && card.tipo === 0){
+        if ($event.fromState === 'in' && $event.toState === 'out' && card && card.tipo === 0){
             const  id = card.id;
             this.homeService.removeCard(id).subscribe(
                 () => {
@@ -390,6 +467,3 @@ export class HomeComponent implements OnInit {
         }
     }
 }
-
-
-

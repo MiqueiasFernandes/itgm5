@@ -22,8 +22,9 @@ import {
     FabAddModeloComponent,
     Customize,
     CustomizeService,
+    Prognose,
+    PrognoseService
 } from '../../entities/';
-
 
 import { ShareService } from '../share/share.service';
 import { FolderComponent } from './folder/folder.component';
@@ -51,14 +52,18 @@ export class SidebarComponent implements OnInit {
     isbasesOpen = false;
     isModelosOpen = false;
     isArquivosOpen = false;
+    isResultadosOpen = false;
     bases: Base[] = null;
     modelos: Modelo[] = null;
     modelosMapeados: number[] = [];
+    prognoses: Prognose[] = [];
+    modelosExclusivos: ModeloExclusivo[] = [];
     customize: Customize = null;
     arquivos = [];
     loadArquivos = false;
     loadBases = false;
     loadModelos = false;
+    lista = [];
 
     constructor(
         private principal: Principal,
@@ -71,7 +76,7 @@ export class SidebarComponent implements OnInit {
         private customizeService: CustomizeService,
         private baseService: BaseService,
         private modeloService: ModeloService,
-        // private accountService: AccountService,
+        private prognoseService: PrognoseService,
         private cenarioService: CenarioService,
     ) {
         this.isSidebarFixed = sidebarService.isLock();
@@ -216,6 +221,7 @@ export class SidebarComponent implements OnInit {
     loadAllBases() {
         this.closeMenuModelos();
         this.closeMenuArquivos();
+        this.closeMenuResultados();
         if (this.bases === null) {
             this.loadBases = true;
             this.customizeService.getCustomize()
@@ -251,6 +257,7 @@ export class SidebarComponent implements OnInit {
     loadAllModelos() {
         this.closeMenuBases();
         this.closeMenuArquivos();
+        this.closeMenuResultados();
         if (this.modelos === null) {
             this.loadModelos = true;
             this.modeloService.getAllModelos().subscribe(
@@ -306,13 +313,13 @@ export class SidebarComponent implements OnInit {
     }
 
     listar() {
-
         if ( this.isArquivosOpen ) {
             this.closeMenuArquivos();
         } else {
             this.loadArquivos = true;
             this.closeMenuBases();
             this.closeMenuModelos();
+            this.closeMenuResultados();
             this.isArquivosOpen = true;
             this.cenarioService
                 .listFiles(this.cenario)
@@ -321,7 +328,7 @@ export class SidebarComponent implements OnInit {
                         res.split(',').forEach((arq) => {
                             this.arquivos.push(
                                 arq.substring(
-                                this.cenario.caminho.length
+                                    this.cenario.caminho.length
                                 )
                             );
                         });
@@ -344,6 +351,44 @@ export class SidebarComponent implements OnInit {
 
     novaPrognose() {
         this.modalService.open(FabAddPrognoseComponent, {size: 'lg'});
+    }
+
+    closeMenuResultados() {
+        this.isResultadosOpen = false;
+        this.prognoses = [];
+    }
+
+    closeMenus() {
+        this.closeMenuArquivos();
+        this.closeMenuModelos();
+        this.closeMenuBases();
+        this.closeMenuResultados();
+    }
+
+    mostrarResultados() {
+        this.closeMenus();
+        this.isResultadosOpen = true;
+        this.prognoseService
+            .getPrognosesByCenario(this.cenario)
+            .subscribe( (prognoses: Prognose[]) => {
+                this.prognoses = prognoses;
+            });
+    }
+
+    loadPrognose($event, p) {
+        this.prognoseService.find(p.id).subscribe((prognose) => {
+            console.log(prognose);
+            p.modeloExclusivos = prognose.modeloExclusivos;
+        });
+        this.setLocal($event, 0, p.id);
+    }
+
+    setLocal($event, nivel, local) {
+        $event.stopPropagation();
+        this.lista[nivel] = local;
+        for (let i = local; i < 5; i++) {
+            this.lista[i] = 0;
+        }
     }
 
 }

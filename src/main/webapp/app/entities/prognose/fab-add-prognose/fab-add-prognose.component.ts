@@ -37,8 +37,9 @@ export class FabAddPrognoseComponent implements OnInit {
     chekMod = [];
     chekEst = [];
     chekGraf = [];
+    radio1 = false;
+    radio2 = false;
     estatisticasLabel = [
-        'RMSE',
         'BIAS',
         'Bias percentual',
         'CE',
@@ -55,7 +56,6 @@ export class FabAddPrognoseComponent implements OnInit {
         'RRMSE'
     ];
     estatisticas = [
-        'estatisticasRMSE',
         'estatisticasBIAS',
         'estatisticasBiasPERCENTUAL',
         'estatisticasCE',
@@ -103,6 +103,7 @@ export class FabAddPrognoseComponent implements OnInit {
         this.prognose.status = 1;
         this.prognose.fncalculavolume = 'calculaVolumeDefault';
         this.prognose.forcepredict = false;
+        this.prognose.dividir = 'campo';
         this.codigo = new Codigo();
     }
 
@@ -140,6 +141,29 @@ export class FabAddPrognoseComponent implements OnInit {
             });
         this.prognose.treino = 0.3;
     }
+
+    setPrognose(prognose: Prognose) {
+        this.setBase1(prognose.ajuste);
+        this.setBase2(prognose.validacao);
+        this.codigo.modo = (prognose.validacao !== null && prognose.validacao !== undefined) ? 2 : 1;
+        this.radio1 = !( this.radio2 = (this.codigo.modo === 2));
+        this.prognose.dividir = prognose.dividir;
+        this.prognose.treino = prognose.treino;
+        prognose.modeloExclusivos.forEach((me) => { this.addModelo({target: { checked: true }}, me); });
+        prognose.estatisticas.split(',').forEach( (stat) => this.addEstatistica({ target: { checked: true}}, ('estatisticas' + stat) ) );
+        prognose.graficos.split(',').forEach( (graf) => this.addGraficos({target: { checked: true }}, graf) );
+        try {
+            const obj = JSON.parse(prognose.mapeamento);
+            this.setdap1( obj.dap1);
+            this.setdap2( obj.dap2);
+            this.setht1(obj.ht1);
+            this.setht2(obj.ht2);
+        } catch (e) {
+            console.log(e);
+        }
+        this.verificar();
+    }
+
     voltar() {
         this.atual = this.etapa = Math.max(this.primeira, --this.etapa);
         this.verificar();
@@ -178,6 +202,7 @@ export class FabAddPrognoseComponent implements OnInit {
                 break;
             case 4:
                 this.feito = this.prognose.graficos && this.prognose.graficos.length > 1;
+                this.graficoBase();
                 break;
             case 5:
                 this.feito = this.codigo.isMapeado();
@@ -188,15 +213,26 @@ export class FabAddPrognoseComponent implements OnInit {
         }
     }
     enviar() {
-        this.prognose.estatisticas = this.prognose.estatisticas.replace(/estatisticas/g, '');
-        this.prognoseService.create(this.prognose).subscribe( (prog) => {
-                alert('Prognose ' + prog.nome + ' criada com sucesso');
-                console.log(prog);
-                this.homeService.openPrognose(prog);
-                this.close();
-            },
-            (error) => this.onError(error.json())
-        );
+        if (this.etapa === 6 && this.feito) {
+            this.prognose.estatisticas = this.prognose.estatisticas.replace(/estatisticas/g, '');
+            this.prognoseService.create(this.prognose).subscribe((prog) => {
+                    // alert('Prognose ' + prog.nome + ' criada com sucesso');
+                    // console.log(prog);
+                    this.homeService.openPrognose(prog);
+                    this.close();
+                },
+                (error) => this.onError(error.json())
+            );
+        } else {
+            alert('Complete todos pasos!');
+        }
+    }
+    graficoBase() {
+        if (!this.prognose.graficos || this.prognose.graficos.indexOf('getggplot2GraphicObservadoXEstimado') < 0) {
+            this.prognose.graficos +=
+                ((!this.prognose.graficos || this.prognose.graficos.length < 5) ? '' :  ',' )
+                + 'getggplot2GraphicObservadoXEstimado';
+        }
     }
     radiobases($event) {
         if ($event.target.checked) {
@@ -219,8 +255,10 @@ export class FabAddPrognoseComponent implements OnInit {
     }
 
     setBase2(base: Base) {
-        this.prognose.validacao = base;
-        this.labelBase2 = base.nome + ' (' + base.id + ')';
+        if (base) {
+            this.prognose.validacao = base;
+            this.labelBase2 = base.nome + ' (' + base.id + ')';
+        }
         this.verificar();
     }
     setDividir(campo) {
@@ -229,6 +267,7 @@ export class FabAddPrognoseComponent implements OnInit {
     }
     addModelo($event, modelo: ModeloExclusivo) {
         const index = this.prognose.modeloExclusivos.findIndex( (modeloE) => modeloE.id === modelo.id );
+        this.chekMod[modelo.id] = true;
         if ($event.target.checked) {
             if (index < 0) {
                 this.prognose.modeloExclusivos.push(modelo);
@@ -241,8 +280,10 @@ export class FabAddPrognoseComponent implements OnInit {
         this.verificar();
     }
 
+    ///estatistica: label
     addEstatistica($event, estatistica: string) {
         const index = this.codigo.estatisitcas.findIndex( (obj) => obj === estatistica );
+        this.chekEst[estatistica] = true;
         if ($event.target.checked) {
             if (index < 0) {
                 this.codigo.estatisitcas.push(estatistica);
@@ -258,6 +299,7 @@ export class FabAddPrognoseComponent implements OnInit {
 
     addGraficos($event, grafico: string) {
         const index = this.codigo.graficos.findIndex( (obj) => obj === grafico );
+        this.chekGraf[grafico] = true;
         if ($event.target.checked) {
             if (index < 0) {
                 this.codigo.graficos.push(grafico);
@@ -292,25 +334,37 @@ export class FabAddPrognoseComponent implements OnInit {
         this.verificar();
     }
     invertMod() {
-        if (this.chekMod.length < 1) {
-            this.modelos.forEach( (k, index) => this.chekMod[index] = true);
-            return;
-        }
-        this.chekMod.forEach( (val, index) => this.chekMod[index] = !val);
+        this.modelos.forEach( (me) => {
+            const index = this.prognose.modeloExclusivos.findIndex( (modeloE) => modeloE.id === me.id );
+            if (index < 0) {
+                this.prognose.modeloExclusivos.push(me);
+            } else {
+                this.prognose.modeloExclusivos.splice(index, 1);
+            }
+            this.chekMod[me.id] = (index < 0);
+        });
     }
     invertEst() {
-        if (this.chekEst.length < 1) {
-            this.estatisticas.forEach( (k, index) => this.chekEst[index] = true);
-            return;
-        }
-        this.chekEst.forEach( (val, index) => this.chekEst[index] = !val);
+        this.estatisticas.forEach( (stat) => {
+            const index = this.codigo.estatisitcas.indexOf(stat);
+            if (index < 0) {
+                this.codigo.estatisitcas.push(stat);
+            } else {
+                this.codigo.estatisitcas.splice(index, 1);
+            }
+            this.chekEst[stat] = (index < 0);
+        });
     }
     invertGraf() {
-        if (this.chekGraf.length < 1) {
-            this.graficos.forEach( (k, index) => this.chekGraf[index] = true);
-            return;
-        }
-        this.chekGraf.forEach( (val, index) => this.chekGraf[index] = !val);
+        this.graficos.forEach( (graf) => {
+            const index = this.codigo.graficos.indexOf(graf);
+            if (index < 0) {
+                this.codigo.graficos.push(graf);
+            } else {
+                this.codigo.graficos.splice(index, 1);
+            }
+            this.chekGraf[graf] = (index < 0);
+        });
     }
     private onError(error) {
         this.alertService.error(error.message);
@@ -349,21 +403,20 @@ export class Codigo {
 
     resetCodigo(): Codigo {
         this.codigo = 'require(ITGM)\n' +
-            'configuracao = list();\n';
+            'cfg=list()\n';
         this.modelos = this.base1 = this.base2 = null;
         return this;
     }
 
     private addModeloExclusivo(modeloEx: ModeloExclusivo) {
         try {
-            this.codigo += 'mg' + modeloEx.id + ' = ' + modeloEx.modelo.codigo + '\n' +
-                'me' + modeloEx.id + ' = mg' + modeloEx.id + '( ' + modeloEx.mapeamento
+            this.codigo += 'mg' + modeloEx.id + '=' + modeloEx.modelo.codigo + '\n' +
+                'me' + modeloEx.id + '=mg' + modeloEx.id + '(' + modeloEx.mapeamento
                     .split(',')
-                    .map( (str) => str.split('=')[0] + ' = \"' + str.split('=')[1] + '\"' )
-                    .join(', ') +
-                ((modeloEx.palpite && (modeloEx.palpite.length > 1)) ? (', palpite=c(' + modeloEx.palpite +  '))') : ')') +
-                '\n';
-            this.modelos = (this.modelos ? (this.modelos + ', ') : '') + 'me' + modeloEx.id;
+                    .map( (str) => str.split('=')[0] + '=\"' + str.split('=')[1] + '\"' )
+                    .join(',') +
+                ((modeloEx.palpite && (modeloEx.palpite.length > 1)) ? (',palpite=c(' + modeloEx.palpite +  '))') : ')') + '\n';
+            this.modelos = (this.modelos ? (this.modelos + ',') : '') + 'me' + modeloEx.id;
         } catch (e) {
             alert('Há um problema: ' + e);
         }
@@ -372,30 +425,30 @@ export class Codigo {
     getCodigo(prognose: Prognose, removeCols) {
         try {
             if (this.modo === 1) {
-                this.codigo += 'dftv = separaDados(get(load(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\")),' +
-                    ' \"' + prognose.dividir + '\", percTraining = ' + prognose.treino + ')\n' +
-                    'configuracao$basePredicao = dftv$treino\n' +
-                    'configuracao$baseProjecao = dftv$validacao\n';
+                this.codigo += 'df=separaDados(get(load(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\")),' +
+                    '\"' + prognose.dividir + '\", percTraining=' + prognose.treino + ')\n' +
+                    'cfg$basePredicao=df$treino\n' +
+                    'cfg$baseProjecao=df$validacao\n';
             }
             if (this.modo === 2) {
-                this.codigo += 'configuracao$basePredicao = load(get(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\"))\n' +
-                    'configuracao$baseProjecao = load(get(\"../../bases/' + prognose.validacao.id + '/' + prognose.validacao.id + '.RData\"))\n';
+                this.codigo += 'cfg$basePredicao=load(get(\"../../bases/' + prognose.ajuste.id + '/' + prognose.ajuste.id + '.RData\"))\n' +
+                    'cfg$baseProjecao=load(get(\"../../bases/' + prognose.validacao.id + '/' + prognose.validacao.id + '.RData\"))\n';
             }
             prognose.modeloExclusivos.forEach((modelo) => this.addModeloExclusivo(modelo));
             this.codigo +=
-                'configuracao$modelos = c('  + this.modelos + ')\n' +
-                'configuracao$estatisticas = list(funcoes = c(' + prognose.estatisticas + '))\n' +
-                'configuracao$graficos = list(funcoes = c(' + prognose.graficos + '), vetorial = F)\n' +
-                'configuracao$mapeamento = list(' +
-                'dap1 = "' + this.mapeamento.dap1 + '", ' +
-                'dap2 = "' + this.mapeamento.dap2 + '", ' +
-                'ht1 = "' + this.mapeamento.ht1 + '", ' +
-                'ht2 = "' + this.mapeamento.ht2 + '")\n' +
-                'configuracao$salvar = ' + prognose.salvar + '\n' +
-                'configuracao$fnCalculaVolume = ' + prognose.fncalculavolume + '\n' +
-                'configuracao$forcePredict = ' + (prognose.forcepredict  ? 'TRUE' : 'FALSE') + '\n' +
-                'configuracao$rmColsSuspicious = ' + (removeCols ? 'TRUE' : 'FALSE') + '\n' +
-                'sd = avaliaModeloEspecial(configuracao)';
+                'cfg$modelos=c('  + this.modelos + ')\n' +
+                'cfg$estatisticas=list(funcoes=c(' + prognose.estatisticas + '))\n' +
+                'cfg$graficos=list(funcoes=c(' + prognose.graficos + '),vetorial=F)\n' +
+                'cfg$mapeamento=list(' +
+                'dap1=\"' + this.mapeamento.dap1 + '\",' +
+                'dap2=\"' + this.mapeamento.dap2 + '\",' +
+                'ht1=\"' + this.mapeamento.ht1 + '\",' +
+                'ht2=\"' + this.mapeamento.ht2 + '\")\n' +
+                'cfg$salvar=' + prognose.salvar + '\n' +
+                'cfg$fnCalculaVolume=' + prognose.fncalculavolume + '\n' +
+                'cfg$forcePredict=' + (prognose.forcepredict  ? 'TRUE' : 'FALSE') + '\n' +
+                'cfg$rmColsSuspicious=' + (removeCols ? 'TRUE' : 'FALSE') + '\n' +
+                'sd=avaliaModeloEspecial(cfg)';
             return this.codigo;
         } catch (e) {
             return 'Impossível gerar o codigo: ERRO ' + e;

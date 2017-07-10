@@ -60,12 +60,19 @@ public class Prognose implements Serializable {
     @Column(name = "status")
     private Integer status;
 
-    @Size(max = 60000)
-    @Column(name = "codigo", length = 60000)
+    @Size(max = 40000)
+    @Column(name = "codigo", length = 40000)
     private String codigo;
 
     @Column(name = "resultado")
     private String resultado;
+
+    @Column(name = "token")
+    private String token;
+
+    @Size(max = 20000)
+    @Column(name = "relatorio", length = 20000)
+    private String relatorio;
 
     @ManyToOne
     private Base ajuste;
@@ -273,6 +280,32 @@ public class Prognose implements Serializable {
         this.resultado = resultado;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public Prognose token(String token) {
+        this.token = token;
+        return this;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getRelatorio() {
+        return relatorio;
+    }
+
+    public Prognose relatorio(String relatorio) {
+        this.relatorio = relatorio;
+        return this;
+    }
+
+    public void setRelatorio(String relatorio) {
+        this.relatorio = relatorio;
+    }
+
     public Base getAjuste() {
         return ajuste;
     }
@@ -375,6 +408,8 @@ public class Prognose implements Serializable {
             ", status='" + status + "'" +
             ", codigo='" + codigo + "'" +
             ", resultado='" + resultado + "'" +
+            ", token='" + token + "'" +
+            ", relatorio='" + relatorio + "'" +
             '}';
     }
 }

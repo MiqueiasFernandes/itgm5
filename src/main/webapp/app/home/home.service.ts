@@ -346,11 +346,10 @@ export class HomeService {
                         this.cardService.create(new Card(
                             undefined, //     id
                             prognose.nome + ': ' + modelo.modelo.nome, // nome
-                            prognose.codigo, // url
+                            '', // url
                             false, // https
-                            '{\"codigo\":\"' + prognose.codigo +
-                            '\",\"status\":' + prognose.status +
-                            ',\"prognose\":' + prognose.id +
+                            '{' +
+                            '\"prognose\":' + prognose.id +
                             ',\"modelo\":' + modelo.id +
                             '}', // meta
                             '', // previa
@@ -364,7 +363,7 @@ export class HomeService {
                             '', // extensao
                             largura,  // largura
                             this.getClassePorTipo(modo), // classe
-                            prognose.codigo, // codigo
+                            prognose.token, // codigo
                             prognose.cenario // cenario
                         )).subscribe((card) => {
                                 console.log(card);
