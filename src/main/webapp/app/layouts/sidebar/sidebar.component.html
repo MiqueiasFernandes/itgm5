@@ -22,9 +22,9 @@
         <ul class="list">
 
             <li class="header">
-                <span (click)="selecionarProjeto()">{{projeto ? projeto.nome : 'selecione um projeto'}}</span>
+                <span (click)="selecionarProjeto()" class="projeto">{{projeto ? projeto.nome : 'selecione um projeto'}}</span>
                 <i class="fa fa-caret-right" aria-hidden="true"></i>
-                <span (click)="selecionarCenario()">{{cenario ? cenario.nome : 'selecione um cenario'}}</span>
+                <span (click)="selecionarCenario()" class="cenario">{{cenario ? cenario.nome : 'selecione um cenario'}}</span>
             </li>
 
             <li *ngIf="projeto !== null && projeto !== undefined" [ngClass]="{'nivel1': true, 'ativo': isbasesOpen}" (click)="loadAllBases()">
@@ -51,7 +51,7 @@
                         </button>
 
                         <button class="btn btn-success btn-sm" (click)="compartilharBase(base)">
-                            <i class="fa fa-share" aria-hidden="true"></i>
+                            <i class="fa fa-share-alt" aria-hidden="true"></i>
                         </button>
                     </li>
 
@@ -80,7 +80,7 @@
                         {{modelo.nome}} ({{modelo.id}})
 
                         <button class="btn btn-info btn-sm" (click)="excluirMapeamento(modelo)" >
-                            <i  class="fa {{isModeloMapeado(modelo) ? 'fa-check' : 'fa-cog'}}"
+                            <i  class="fa {{isModeloMapeado(modelo) ? 'fa-check' : 'fa-wrench'}}"
                                 aria-hidden="true">
                             </i>
                         </button>
@@ -93,7 +93,7 @@
                         </button>
 
                         <button class="btn btn-success btn-sm" (click)="compartilharModelo(modelo)">
-                            <i class="fa fa-share" aria-hidden="true"></i>
+                            <i class="fa fa-share-alt" aria-hidden="true"></i>
                         </button>
 
                     </li>
@@ -119,131 +119,266 @@
                          'fa-chevron-down' : !isResultadosOpen
                          }" aria-hidden="true"></i>
                 </div>
-                <ul class="nivel2">
-                    <li *ngFor="let prognose of prognoses" (click)="loadPrognose($event,prognose)">
+                <ul class="nivel2" id="resultados">
+                    <li *ngFor="let prognose of prognoses" (click)="loadPrognose($event,prognose)" class="prognose" [ngClass]="{'act':lista[0] === prognose.id}" >
                         {{prognose.nome}}
                         <ul *ngIf="lista[0] === prognose.id">
-                            <li *ngFor="let modelo of prognose.modeloExclusivos" (click)="setLocal($event,1,modelo.id)">
+                            <li *ngFor="let modelo of prognose.modeloExclusivos" (click)="setLocal($event,1,modelo.id)" class="modelo"  [ngClass]="{'act':lista[1] === modelo.id}" >
                                 {{modelo.nome}}
+                                <button class="btn btn-info btn-sm"  >
+                                    <i class="fa fa-bolt" aria-hidden="true"></i>
+                                </button>
                                 <ul *ngIf="lista[1] === modelo.id">
-                                    <li (click)="setLocal($event,2,1)">
+                                    <li (click)="setLocal($event,2,1)" class="ajuste"  [ngClass]="{'act':lista[2] === 1}" >
                                         Ajuste
                                         <ul *ngIf="lista[2] === 1">
-                                            <li (click)="setLocal($event,3,1)">DAP
+                                            <li (click)="setLocal($event,3,1)" class="dap"  [ngClass]="{'act':lista[3] === 1}">DAP
                                                 <ul  *ngIf="lista[3] === 1">
-                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                    <li (click)="setLocal($event,4,1)" class="estatisticas"  [ngClass]="{'act':lista[4] === 1}">Estatiticas
                                                         <ul *ngIf="lista[4] === 1">
-                                                            <li>stat 1</li>
-                                                            <li>stat 2</li>
-                                                            <li>stat 3</li>
+
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).bias" >BIAS: {{getEstatisticas(prognose,modelo,true,1).bias | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(prognose,modelo,true,1).biasPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).ce" >CE: {{getEstatisticas(prognose,modelo,true,1).ce | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).corr" >correlação: {{getEstatisticas(prognose,modelo,true,1).corr | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(prognose,modelo,true,1).corr_PERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).cv" >covariância: {{getEstatisticas(prognose,modelo,true,1).cv | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(prognose,modelo,true,1).cvPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).mae" >MAE: {{getEstatisticas(prognose,modelo,true,1).mae | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).r2" >R2: {{getEstatisticas(prognose,modelo,true,1).r2 | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).rmse" >RMSE: {{getEstatisticas(prognose,modelo,true,1).rmse | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,true,1).rmsePERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,true,1).rrmse | number : '1.2-2' }}</li>
+                                                            <li *ngIf="getResultados(prognose,modelo,true,1).estatisticas2" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            </li>
+                                                            <li *ngIf="getResultados(prognose,modelo,true,1).coeficientes" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            </li>
+
+
                                                         </ul>
                                                     </li>
-                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                    <li  (click)="setLocal($event,4,2)" class="graficos"  [ngClass]="{'act':lista[4] === 2}">
+                                                        Gráficos
+                                                        <button class="btn btn-info btn-sm"  >
+                                                            <i  class="fa fa-bar-chart"></i>
+                                                        </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li>ObservadoXEstimado</li>
-                                                            <li>Resíduo Absoluto</li>
-                                                            <li>Resíduo Percentual</li>
-                                                            <li>Histograma de Resíduos</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li (click)="setLocal($event,3,2)">HT
+                                            <li (click)="setLocal($event,3,2)" class="ht"  [ngClass]="{'act':lista[3] === 2}">HT
                                                 <ul  *ngIf="lista[3] === 2">
-                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                    <li (click)="setLocal($event,4,1)" class="estatisticas"  [ngClass]="{'act':lista[4] === 1}">Estatiticas
                                                         <ul *ngIf="lista[4] === 1">
-                                                            <li>stat 1</li>
-                                                            <li>stat 2</li>
-                                                            <li>stat 3</li>
+
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).bias" >BIAS: {{getEstatisticas(prognose,modelo,true,2).bias | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(prognose,modelo,true,2).biasPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).ce" >CE: {{getEstatisticas(prognose,modelo,true,2).ce | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).corr" >correlação: {{getEstatisticas(prognose,modelo,true,2).corr | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(prognose,modelo,true,2).corr_PERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).cv" >covariância: {{getEstatisticas(prognose,modelo,true,2).cv | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(prognose,modelo,true,2).cvPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).mae" >MAE: {{getEstatisticas(prognose,modelo,true,2).mae | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).r2" >R2: {{getEstatisticas(prognose,modelo,true,2).r2 | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).rmse" >RMSE: {{getEstatisticas(prognose,modelo,true,2).rmse | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,true,2).rmsePERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,true,2).rrmse | number : '1.2-2' }}</li>
+                                                            <li *ngIf="getResultados(prognose,modelo,true,2).estatisticas2" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            </li>
+                                                            <li *ngIf="getResultados(prognose,modelo,true,2).coeficientes" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            </li>
+
+
                                                         </ul>
                                                     </li>
-                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                    <li  (click)="setLocal($event,4,2)" class="graficos"  [ngClass]="{'act':lista[4] === 2}">
+                                                        Gráficos
+                                                        <button class="btn btn-info btn-sm"  >
+                                                            <i  class="fa fa-bar-chart"></i>
+                                                        </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li>ObservadoXEstimado</li>
-                                                            <li>Resíduo Absoluto</li>
-                                                            <li>Resíduo Percentual</li>
-                                                            <li>Histograma de Resíduos</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li (click)="setLocal($event,3,3)">Volume Total
+                                            <li (click)="setLocal($event,3,3)" class="volume"  [ngClass]="{'act':lista[3] === 3}">Volume Total
                                                 <ul  *ngIf="lista[3] === 3">
-                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                    <li (click)="setLocal($event,4,1)" class="estatisticas"  [ngClass]="{'act':lista[4] === 1}">Estatiticas
                                                         <ul *ngIf="lista[4] === 1">
-                                                            <li>stat 1</li>
-                                                            <li>stat 2</li>
-                                                            <li>stat 3</li>
+
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).bias" >BIAS: {{getEstatisticas(prognose,modelo,true,3).bias | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(prognose,modelo,true,3).biasPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).ce" >CE: {{getEstatisticas(prognose,modelo,true,3).ce | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).corr" >correlação: {{getEstatisticas(prognose,modelo,true,3).corr | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(prognose,modelo,true,3).corr_PERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).cv" >covariância: {{getEstatisticas(prognose,modelo,true,3).cv | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(prognose,modelo,true,3).cvPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).mae" >MAE: {{getEstatisticas(prognose,modelo,true,3).mae | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).r2" >R2: {{getEstatisticas(prognose,modelo,true,3).r2 | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).rmse" >RMSE: {{getEstatisticas(prognose,modelo,true,3).rmse | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,true,3).rmsePERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,true,3).rrmse | number : '1.2-2' }}</li>
+                                                            <li *ngIf="getResultados(prognose,modelo,true,3).estatisticas2" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            </li>
+                                                            <li *ngIf="getResultados(prognose,modelo,true,3).coeficientes" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            </li>
+
+
                                                         </ul>
                                                     </li>
-                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                    <li  (click)="setLocal($event,4,2)" class="graficos"  [ngClass]="{'act':lista[4] === 2}">
+                                                        Gráficos
+                                                        <button class="btn btn-info btn-sm"  >
+                                                            <i  class="fa fa-bar-chart"></i>
+                                                        </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li>ObservadoXEstimado</li>
-                                                            <li>Resíduo Absoluto</li>
-                                                            <li>Resíduo Percentual</li>
-                                                            <li>Histograma de Resíduos</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                             </li>
                                         </ul>
                                     </li>
-                                    <li (click)="setLocal($event,2,2)">
+                                    <li (click)="setLocal($event,2,2)" class="validacao"  [ngClass]="{'act':lista[2] === 2}">
                                         Validação
                                         <ul *ngIf="lista[2] === 2">
-                                            <li (click)="setLocal($event,3,1)">DAP
+                                            <li (click)="setLocal($event,3,1)" class="dap"  [ngClass]="{'act':lista[3] === 1}">DAP
                                                 <ul  *ngIf="lista[3] === 1">
-                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                    <li (click)="setLocal($event,4,1)" class="estatisticas"  [ngClass]="{'act':lista[4] === 1}">Estatiticas
                                                         <ul *ngIf="lista[4] === 1">
-                                                            <li>stat 1</li>
-                                                            <li>stat 2</li>
-                                                            <li>stat 3</li>
+
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).bias" >BIAS: {{getEstatisticas(prognose,modelo,false,1).bias | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(prognose,modelo,false,1).biasPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).ce" >CE: {{getEstatisticas(prognose,modelo,false,1).ce | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).corr" >correlação: {{getEstatisticas(prognose,modelo,false,1).corr | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(prognose,modelo,false,1).corr_PERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).cv" >covariância: {{getEstatisticas(prognose,modelo,false,1).cv | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(prognose,modelo,false,1).cvPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).mae" >MAE: {{getEstatisticas(prognose,modelo,false,1).mae | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).r2" >R2: {{getEstatisticas(prognose,modelo,false,1).r2 | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).rmse" >RMSE: {{getEstatisticas(prognose,modelo,false,1).rmse | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,false,1).rmsePERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,false,1).rrmse | number : '1.2-2' }}</li>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,1).estatisticas2" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            </li>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,1).coeficientes" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            </li>
+
+
                                                         </ul>
                                                     </li>
-                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                    <li  (click)="setLocal($event,4,2)" class="graficos"  [ngClass]="{'act':lista[4] === 2}">
+                                                        Gráficos
+                                                        <button class="btn btn-info btn-sm"  >
+                                                            <i  class="fa fa-bar-chart"></i>
+                                                        </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li>ObservadoXEstimado</li>
-                                                            <li>Resíduo Absoluto</li>
-                                                            <li>Resíduo Percentual</li>
-                                                            <li>Histograma de Resíduos</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li (click)="setLocal($event,3,2)">HT
+                                            <li (click)="setLocal($event,3,2)" class="ht"  [ngClass]="{'act':lista[3] === 2}">HT
                                                 <ul  *ngIf="lista[3] === 2">
-                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                    <li (click)="setLocal($event,4,1)" class="estatisticas"  [ngClass]="{'act':lista[4] === 1}">Estatiticas
                                                         <ul *ngIf="lista[4] === 1">
-                                                            <li>stat 1</li>
-                                                            <li>stat 2</li>
-                                                            <li>stat 3</li>
+
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).bias" >BIAS: {{getEstatisticas(prognose,modelo,false,2).bias | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(prognose,modelo,false,2).biasPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).ce" >CE: {{getEstatisticas(prognose,modelo,false,2).ce | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).corr" >correlação: {{getEstatisticas(prognose,modelo,false,2).corr | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(prognose,modelo,false,2).corr_PERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).cv" >covariância: {{getEstatisticas(prognose,modelo,false,2).cv | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(prognose,modelo,false,2).cvPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).mae" >MAE: {{getEstatisticas(prognose,modelo,false,2).mae | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).r2" >R2: {{getEstatisticas(prognose,modelo,false,2).r2 | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).rmse" >RMSE: {{getEstatisticas(prognose,modelo,false,2).rmse | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,false,2).rmsePERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,false,2).rrmse | number : '1.2-2' }}</li>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,2).estatisticas2" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            </li>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,2).coeficientes" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            </li>
+
+
                                                         </ul>
                                                     </li>
-                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                    <li  (click)="setLocal($event,4,2)" class="graficos"  [ngClass]="{'act':lista[4] === 2}">
+                                                        Gráficos
+                                                        <button class="btn btn-info btn-sm"  >
+                                                            <i  class="fa fa-bar-chart"></i>
+                                                        </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li>ObservadoXEstimado</li>
-                                                            <li>Resíduo Absoluto</li>
-                                                            <li>Resíduo Percentual</li>
-                                                            <li>Histograma de Resíduos</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li (click)="setLocal($event,3,3)">Volume Total
+                                            <li (click)="setLocal($event,3,3)" class="volume"  [ngClass]="{'act':lista[3] === 3}">Volume Total
                                                 <ul  *ngIf="lista[3] === 3">
-                                                    <li (click)="setLocal($event,4,1)">Estatiticas
+                                                    <li (click)="setLocal($event,4,1)" class="estatisticas"  [ngClass]="{'act':lista[4] === 1}">Estatiticas
                                                         <ul *ngIf="lista[4] === 1">
-                                                            <li>stat 1</li>
-                                                            <li>stat 2</li>
-                                                            <li>stat 3</li>
+
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).bias" >BIAS: {{getEstatisticas(prognose,modelo,false,3).bias | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(prognose,modelo,false,3).biasPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).ce" >CE: {{getEstatisticas(prognose,modelo,false,3).ce | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).corr" >correlação: {{getEstatisticas(prognose,modelo,false,3).corr | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(prognose,modelo,false,3).corr_PERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).cv" >covariância: {{getEstatisticas(prognose,modelo,false,3).cv | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(prognose,modelo,false,3).cvPERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).mae" >MAE: {{getEstatisticas(prognose,modelo,false,3).mae | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).r2" >R2: {{getEstatisticas(prognose,modelo,false,3).r2 | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).rmse" >RMSE: {{getEstatisticas(prognose,modelo,false,3).rmse | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,false,3).rmsePERCENTUAL | number : '1.2-2' }}</li>
+                                                            <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,false,3).rrmse | number : '1.2-2' }}</li>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            </li>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" >
+                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            </li>
+
+
                                                         </ul>
                                                     </li>
-                                                    <li  (click)="setLocal($event,4,2)">Gráficos
+                                                    <li  (click)="setLocal($event,4,2)" class="graficos"  [ngClass]="{'act':lista[4] === 2}">
+                                                        Gráficos
+                                                        <button class="btn btn-info btn-sm"  >
+                                                            <i  class="fa fa-bar-chart"></i>
+                                                        </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li>ObservadoXEstimado</li>
-                                                            <li>Resíduo Absoluto</li>
-                                                            <li>Resíduo Percentual</li>
-                                                            <li>Histograma de Resíduos</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -276,6 +411,6 @@
     </div>
 
     <div class="footer">
-        (C) UFES
+        Trabalho de conclusão de curso apresentado ao Departamento de Computação da Universidade Federal do Espírito Santo
     </div>
 </div>

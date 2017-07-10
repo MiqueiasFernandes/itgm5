@@ -1,4 +1,74 @@
-//@import "../../../content/scss/global.scss";
+
+
+#resultados:hover{
+    background: darkslategrey;
+}
+
+.prognose, .modelo, .ajuste, .validacao, .dap, .ht, .volume, .estatisticas, .graficos, .grafico, .stat{
+    list-style: none;
+    margin-left: -30px;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.prognose.act, .prognose.act:hover{
+background: #005100;
+}
+
+.modelo.act, .modelo.act:hover{
+background: #009a2a;
+}
+
+.ajuste.act, .ajuste.act:hover, .validacao.act, .validacao.act:hover{
+background: #00bd61;
+}
+
+.dap.act, .dap.act:hover, .ht.act, .ht.act:hover, .volume.act, .volume.act:hover{
+background: #5ebc7f;
+}
+
+.estatisticas.act, .estatisticas.act:hover, .graficos.act, .graficos.act:hover{
+    background: #78d261;
+}
+
+.grafico.act, .grafico.act:hover, .stat.act, .stat.act:hover{
+    background: #83f1a9;
+}
+
+.prognose:hover {
+    background: #053302;
+}
+
+.modelo:hover {
+    background: #054700;
+}
+
+.ajuste:hover, .validacao:hover {
+    background: #076600;
+}
+
+.dap:hover, .ht:hover, .volume:hover {
+    background: #0a8300;
+}
+
+.estatisticas:hover, .graficos:hover {
+    background: #0ca300;
+}
+
+.grafico:hover, .stat:hover{
+    background: #2cb01c;
+}
+
+
+.projeto{
+    font-size: 30px;
+    font-variant: small-caps;
+    line-height: 8px;
+}
+
+.cenario{
+    font-size: 20px;
+}
 
 .sidebar {
     margin-top: 60px;
@@ -93,26 +163,27 @@
     cursor: pointer;
 }
 
-.sidebar .menu .level1{
-    font-weight: 900;
+li.nivel1{
+    font-weight: 500;
+}
+li.nivel1:hover{
+    background: #01392e;
+}
+li.nivel1.ativo, li.nivel1.ativo:hover{
+    background: darkslategrey;
 }
 
 .sidebar .menu li{
     color: white;
     padding: 15px;
-}
-
-.sidebar .menu .nivel1:hover{
-    background: darkslategrey;
-}
-
-.sidebar .menu .ativo {
-    background: darkslategrey;
-    font-weight: bold;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
 }
 
 .sidebar .menu .nivel2:hover {
-    background: black;
+    background: #233c3c;
 }
 .sidebar .menu .nivel2{
     font-weight: normal;
@@ -134,9 +205,10 @@
     bottom: 0;
     width: 100%;
     border-top: 1px solid #eee;
-    padding: 15px;
+    padding: 5px;
     overflow: hidden;
     height: 70px;
+    font-size: 12px;
 }
 
 .right{

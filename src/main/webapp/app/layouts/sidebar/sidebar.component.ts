@@ -386,10 +386,48 @@ export class SidebarComponent implements OnInit {
     setLocal($event, nivel, local) {
         $event.stopPropagation();
         this.lista[nivel] = local;
-        for (let i = local; i < 5; i++) {
+        for (let i = nivel + 1; i < 5; i++) {
             this.lista[i] = 0;
         }
+        console.log(this.lista);
     }
+
+    getResultados(prognose: Prognose, modelo: ModeloExclusivo, ajuse, modo) {
+        let obj: any;
+        try {
+            obj = JSON.parse(prognose.relatorio)
+                .resultados[modelo.modelo.nome];
+        } catch (e) {
+            console.log(e);
+            return {};
+        }
+        return ajuse ? (obj.ajuste ? obj.ajuste : {}) : (obj.validacao ? obj.validacao : {});
+    }
+
+
+    getEstatisticas(prognose, modelo, ajuse, modo) {
+        let obj = {
+            bias: undefined,
+            biasPERCENTUAL: undefined,
+            ce: undefined,
+            corr: undefined,
+            corr_PERCENTUAL: undefined,
+            cv: undefined,
+            cvPERCENTUAL: undefined,
+            mae: undefined,
+            r2: undefined,
+            rmse: undefined,
+            rmsePERCENTUAL: undefined,
+            rrmse: undefined
+        };
+        try {
+            obj = Object.assign(obj, this.getResultados(prognose, modelo, ajuse, modo).estatisticas);
+        } catch (e) {
+            console.log(e);
+        }
+        return obj;
+    }
+
 
 }
 
