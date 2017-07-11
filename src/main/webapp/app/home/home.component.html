@@ -105,7 +105,7 @@
                     <ul class="dropdown-menu pull-right" [ngClass]="{visivel: dropdows[card.id]}">
 
                         <li *ngIf="isDestacavel(card)"  class="dropdown-item" (click)="destacar(card, carde)">
-                            <i class="fa fa-external-link" aria-hidden="true"></i> Destacar
+                            <i class="fa fa-external-link" aria-hidden="true"></i> Vizualizar em janela separada
                         </li>
 
                         <li *ngIf="isArquivo(card)"  class="dropdown-item" (click)="baixar(card)">
@@ -115,11 +115,11 @@
                         </li>
 
                         <li *ngIf="isResize(card)"  class="dropdown-item" (click)="ampliar(card)">
-                            <i class="fa fa-window-maximize" aria-hidden="true"></i> Ampliar
+                            <i class="fa fa-window-maximize" aria-hidden="true"></i> Ampliar a imagem
                         </li>
 
                         <li  *ngIf="isResize(card)" class="dropdown-item" (click)="reduzir(card)">
-                            <i class="fa fa-window-minimize" aria-hidden="true"></i> Reduzir
+                            <i class="fa fa-window-minimize" aria-hidden="true"></i> Ver informações sobre o arquivo
                         </li>
 
                         <li  *ngIf="(prognoses2[card.id] && (prognoses2[card.id].status >= 4))" class="dropdown-item" (click)="duplicar(card)">
