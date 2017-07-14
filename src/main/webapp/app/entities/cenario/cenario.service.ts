@@ -100,6 +100,15 @@ export class CenarioService {
                            content: boolean,
                            cript: boolean,
                            i: boolean): Observable<any> {
+
+        console.log('d: ' + d);
+        console.log('s: ' + s);
+        console.log('f: ' + f);
+        console.log('m: ' + m);
+        console.log('co: ' + content);
+        console.log('cr: ' + cript);
+        console.log('i: ' + i);
+
             return this.http
                 .get(`${this.resourceUrl}/publicar/${c.id}/?diretorio=${d}&subdiretorio=${s}&file=${f}&meta=${m}&content=${content}&cript=${cript}&image=${i}`)
                 .map((res) => res.json());

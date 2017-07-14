@@ -73,18 +73,20 @@
                             <label for="duas">Duas bases de dados diferentes, uma para ajuste e uma avaliação</label>
                         </div>
 
-                        Base para  {{ codigo.modo === 2 ? ' ajuste:' : ' ajuste e validação:'}}
-                        <div ngbDropdown class="nav-item dropdown pointer">
-                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
-                                {{labelBase1}}
-                            </button>
-                            <ul class="dropdown-menu" ngbDropdownMenu>
-                                <li *ngFor="let base of bases">
-                                    <a class="dropdown-item" (click)="setBase1(base)">
-                                        {{base.nome}} ({{base.id}})
-                                    </a>
-                                </li>
-                            </ul>
+                        <div *ngIf="codigo.modo > 0">
+                            Base para  {{ codigo.modo === 2 ? ' ajuste:' : ' ajuste e validação:'}}
+                            <div ngbDropdown class="nav-item dropdown pointer">
+                                <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                    {{labelBase1}}
+                                </button>
+                                <ul class="dropdown-menu" ngbDropdownMenu>
+                                    <li *ngFor="let base of bases">
+                                        <a class="dropdown-item" (click)="setBase1(base)">
+                                            {{base.nome}} ({{base.id}})
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div *ngIf="codigo.modo === 2">
@@ -106,8 +108,8 @@
                         <div *ngIf="codigo.modo === 1">
                             <p>Defina o percentual para treino:</p>
                             <div class="form-group">
-                                <label for="treino">Treino: </label>
-                                <input type="number" id="treino" [(ngModel)]="prognose.treino" min="0.1" max="0.9" step="0.1">
+                                <label for="treino">(%) da base para treino: </label>
+                                <input type="number" id="treino" [(ngModel)]="prognose.treino" min="1" max="100" step="1">
                             </div>
                             <p>Defina o campo utilizado como identificador de observações da base:</p>
                             <div ngbDropdown class="nav-item dropdown pointer">
@@ -134,13 +136,22 @@
                             obs.: os modelos devem estar mapeados.
                         </p>
                         <br>
-                        <button class="btn btn-primary" (click)="invertMod()">inverter</button>
+                        <button class="btn btn-primary" (click)="invertMod()">
+                            {{ getLabelModelo() }}
+                        </button>
+                        <button class="btn btn-primary" (click)="ediarPalpites = !ediarPalpites">
+                            {{ediarPalpites ? 'Ocultar caixa de edição de ' : 'Editar '}}   palpites
+                        </button>
+                        <button class="btn btn-primary" (click)="desfazerPalpites()" *ngIf="ediarPalpites">
+                            reverter palpites
+                        </button>
                         <br>
                         Modelos:
                         <ul>
                             <li *ngFor="let modelo of modelos; let id = index;">
                                 <input type="checkbox" id="'modelo-' + {{modelo.id}}" (change)="addModelo($event, modelo)" [checked]="chekMod[modelo.id]">
                                 <label for="'modelo-' + {{modelo.id}}">{{modelo.nome}} ({{modelo.id}})</label>
+                                 (palpite: <input type="text" [(ngModel)]="palpites[modelo.id]" *ngIf="ediarPalpites"> {{ !ediarPalpites ? palpites[modelo.id] : '' }})
                             </li>
                         </ul>
 
@@ -151,11 +162,13 @@
                             Quais estatisticas serão utilizadas para avaliar os modelos?
                         </p>
                         <br>
-                        <button class="btn btn-primary" (click)="invertEst()">inverter</button>
+                        <button class="btn btn-primary" (click)="invertEst()">
+                            {{ getLabelEstatistica() }}
+                        </button>
                         <br>
                         <ul>
                             <li *ngFor="let estatistica of estatisticas;let id = index">
-                                <input type="checkbox" id="'estat-' + {{id}}" (change)="addEstatistica($event, estatistica)" [checked]="chekEst[estatistica]">
+                                <input type="checkbox" id="'estat-' + {{id}}" (change)="addEstatistica($event, estatistica, true)" [checked]="chekEst[estatistica]">
                                 <label for="'estat-' + {{id}}">{{estatisticasLabel[id]}}</label>
                             </li>
                         </ul>
@@ -167,11 +180,17 @@
                             Quais gráficos devem ser gerados?
                         </p>
                         <br>
-                        <button class="btn btn-primary" (click)="invertGraf()">inverter</button>
+                        <button class="btn btn-primary" (click)="invertGraf()">
+                            {{ getLabelGrafico() }}
+                        </button>
                         <br>
                         <ul>
+                            <li>
+                                <input type="checkbox" id="'graf-999"  checked disabled>
+                                <label for="'graf-999">Gráfico Observado X Estimado</label>
+                            </li>
                             <li *ngFor="let grafico of graficos;let id = index">
-                                <input type="checkbox" id="'graf-' + {{id}}" (change)="addGraficos($event, grafico)"  [checked]="chekGraf[grafico] || id === 0" [disabled]="id === 0">
+                                <input type="checkbox" id="'graf-' + {{id}}" (change)="addGraficos($event, grafico)"  [checked]="chekGraf[grafico]">
                                 <label for="'graf-' + {{id}}">{{graficosLabel[id]}}</label>
                             </li>
                         </ul>
@@ -252,8 +271,13 @@
                         </div>
 
                         <div class="form-group">
-                            <input type="checkbox" [(ngModel)]="removerColSus" id="rem" checked>
+                            <input type="checkbox" [(ngModel)]="removerColSus" id="rem" (change)="compilar()" checked>
                             <label for="rem">Remover campos suspeitos caso existam na base.</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="checkbox" (change)="compilar()" [(ngModel)]="maxIt" id="it" checked>
+                            <label for="it">Resolver problema de limite de iterações.</label>
                         </div>
 
                         <textarea class="form-control" [(ngModel)]="prognose.codigo"></textarea>
@@ -270,7 +294,7 @@
         <button (click)="avancar()" class="btn btn-primary"  [disabled]="onLoad || !feito" [ngClass]="{'invisivel':  etapa >= ultima}" style="margin-right: 25%;">
             Avançar
         </button>
-        <button (click)="enviar()" class="btn btn-success"  [disabled]="onLoad || etapa < ultima || !feito">
+        <button (click)="enviar()" class="btn btn-success"  [disabled]="onLoad"  [ngClass]="{'invisivel':  etapa < ultima || !feito}">
             Criar
         </button>
     </div>

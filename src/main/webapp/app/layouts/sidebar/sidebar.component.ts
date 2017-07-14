@@ -5,7 +5,7 @@ import {EventManager} from 'ng-jhipster';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Account, AccountService, Principal} from '../../shared';
 import {SidebarService} from './sidebar.service';
-
+import { HomeService } from '../../home/home.service';
 import {
     Projeto,
     Cenario,
@@ -78,6 +78,7 @@ export class SidebarComponent implements OnInit {
         private modeloService: ModeloService,
         private prognoseService: PrognoseService,
         private cenarioService: CenarioService,
+        private homeService: HomeService
     ) {
         this.isSidebarFixed = sidebarService.isLock();
 
@@ -392,18 +393,26 @@ export class SidebarComponent implements OnInit {
         console.log(this.lista);
     }
 
+    getObj(prognose: Prognose, modelo: ModeloExclusivo, ajuse, modo) {
+        try {
+            return JSON.parse(prognose.relatorio)
+                .resultados[modelo.modelo.nome];
+        } catch (e) {
+            console.log(e);
+            return {};
+        }
+    }
+
     getResultados(prognose: Prognose, modelo: ModeloExclusivo, ajuse, modo) {
         let obj: any;
         try {
-            obj = JSON.parse(prognose.relatorio)
-                .resultados[modelo.modelo.nome];
+            obj = this.getObj(prognose, modelo, ajuse, modo);
         } catch (e) {
             console.log(e);
             return {};
         }
         return ajuse ? (obj.ajuste ? obj.ajuste : {}) : (obj.validacao ? obj.validacao : {});
     }
-
 
     getEstatisticas(prognose, modelo, ajuse, modo) {
         let obj = {
@@ -428,6 +437,151 @@ export class SidebarComponent implements OnInit {
         return obj;
     }
 
+    getDiretorio(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const obj = this.getObj(prognose, modelo, ajuste, modo);
+        // const resultados = this.getResultados(prognose, modelo, ajuste, modo);
+        const alias = obj.alias;
+
+        let str = '';
+        let md = 'Volume';
+        if (modo === 0) {
+            str += 'dap/';
+            md = 'DAP';
+        } else if (modo === 1) {
+            str += 'ht/';
+            md = 'HT';
+        }
+
+        str += alias;
+        let tp = 'Ajuste';
+        if (!ajuste) {
+            str += '/validacao';
+            tp = 'Validacao';
+        }
+
+        const ret =  [ str, tp, md, alias];
+        console.log(ret);
+
+        return ret;
+    }
+
+    // getArquivo(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+    //     const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+    //     return dados[0] + dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas do modelo.csv';
+    // }
+    getArquivoSTAT1(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas.csv';
+        this.show(prognose, dados[0], dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas.csv');
+    }
+    getArquivoSTAT2(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas do modelo.csv';
+        this.show(prognose, dados[0], dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas do modelo.csv');
+    }
+    getArquivoGrafGG(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[3] + ' ' + dados[2] + ' ' + dados[1] + '.png';
+        this.show(prognose, dados[0], dados[3] + ' ' + dados[2] + ' ' + dados[1] + '.png');
+    }
+    getArquivoGrafHIST(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[3] + ' ' + dados[2] + ' ' + dados[1] + 'Histogram.png';
+        this.show(prognose, dados[0], dados[3] + ' ' + dados[2] + ' '  + dados[1]  + 'Histogram.png');
+    }
+    getArquivoGrafDINAM(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[3] + ' ' + dados[2] + ' ' + dados[1] + 'ObservadoXEstimado.html';
+        this.show(prognose, dados[0], dados[3] + ' ' + dados[2] + ' '  + dados[1]  +  'ObservadoXEstimado.html');
+    }
+    getArquivoGrafBASE(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[3] + ' ' + dados[2] + ' ' + dados[1] + 'ObservadoXEstimado.png';
+        this.show(prognose, dados[0], dados[3] + ' ' + dados[2] + ' '  + dados[1]  + 'ObservadoXEstimado.png');
+    }
+    getArquivoGrafRES(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[3] + ' ' + dados[2] + ' ' + dados[1] + 'ResiduoAbs.png';
+        this.show(prognose, dados[0], dados[3] + ' ' + dados[2] + ' '  + dados[1]  + 'ResiduoAbs.png');
+    }
+    getArquivoGrafRESP(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
+        const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
+        // return dados[0] + dados[3] + ' ' + dados[2] + ' ' + dados[1] + 'ResiduoPerc.png';
+        this.show(prognose, dados[0], dados[3] + ' ' + dados[2] + ' ' + dados[1]  + 'ResiduoPerc.png');
+    }
+
+    show(prognose, subdiretorio, file) {
+        ////publicar arquivo
+        // this.loading[file] = true;
+        subdiretorio = '/resultados/' + subdiretorio + '/';
+        const isText = this.homeService.isText(file);
+        this.customizeService.getCustomize()
+            .subscribe((custom: Customize) => {
+                    if (custom.cenario) {
+                        this.cenarioService.publicarArquivo(
+                            custom.cenario,
+                           'prognose' + prognose.id,
+                            subdiretorio,
+                            file,
+                            !isText,  ///meta
+                            isText,  ///content
+                            isText, ////cript
+                            this.homeService.getTipoPorArquivo(file) === 'figura'   ///imagem
+                        )
+                            .subscribe((nfile: any) => {
+                                    if (isText) {
+                                        this.cenarioService.publicarArquivo(
+                                            custom.cenario,
+                                            'prognose' + prognose.id,
+                                            subdiretorio,
+                                            file,
+                                            true,  ///meta
+                                            false,
+                                            false,
+                                            false
+                                        )
+                                            .subscribe((url: any) => {
+                                                    this.homeService.abrirArquivo(
+                                                        file,       ///arquivo
+                                                        url,        ///meta
+                                                        prognose.caminho,    ///caminho
+                                                        nfile.file  ///previa
+                                                    );
+                                                },
+                                                (error) => {
+                                                    alert('152) houve um erro: ' + error.json());
+                                                    this.pararLoading(file);
+                                                });
+                                    } else {
+                                        this.homeService.abrirArquivo(
+                                            file,       ///arquivo
+                                            nfile,      ///meta
+                                            prognose.caminho,    ///caminho
+                                            null
+                                        );
+                                    }
+                                    this.pararLoading(file);
+                                },
+                                (error) => {
+                                    alert('169) houve um erro: ' + error);
+                                    this.pararLoading(file);
+                                }
+                            );
+                    } else {
+                        alert('173) selecione um cenario!');
+                    }
+                },
+                (error) => {
+                    alert('177) houve um erro: ' + error.json());
+                    this.pararLoading(file);
+                }
+            );
+
+    }
+
+    public pararLoading(file: string) {
+        // this.loading[file] = false;
+    }
 
 }
 

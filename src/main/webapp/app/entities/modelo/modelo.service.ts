@@ -121,7 +121,7 @@ export class ModeloService {
             'I1,I2', // variaveis
             'b0=1, b1=-0.05', // palpite
             '', // parametros
-            'minpack', // requires
+            'minpack.lm', // requires
             'criaModeloGenerico(nome ="schumacher tome", formula = "y2~y1+exp(b0-(b1*I2))-exp(b0-(b1*I1))",' +
             ' funcaoRegressao = "nlsLM", variaveis = c("I1", "I2"), palpite = "b0=1, b1=-0.05", requires = "minpack.lm")', // codigo
             user // user

@@ -114,7 +114,7 @@ export class FolderComponent {
         return certo;
     }
 
-    show(file){
+    show(file) {
         ////publicar arquivo
         this.loading[file] = true;
         const isText = this.homeService.isText(file);

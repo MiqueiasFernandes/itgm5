@@ -1,4 +1,20 @@
 
+
+
+
+.coeficientes {
+    width: 80%;
+    margin: 20px;
+    text-align: center;
+    margin-left: 50px;
+}
+
+tr.beta:hover{
+    background: aliceblue!important;
+}
+
+
+
 .dropdown-menu {
     cursor: pointer;
 }
@@ -21,6 +37,7 @@
     padding: 0.8%;
     padding-right: 1.2%;
     border-right: 1px solid #f0f0f0;
+    margin-bottom: 10px;
 }
 
 .direito {

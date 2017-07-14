@@ -6,6 +6,7 @@ import { ItgmSharedModule } from '../shared';
 import { HOME_ROUTE, HomeComponent } from './';
 
 import { HomeService } from './home.service';
+import { ShowImageComponent } from './show-image/show-image.component';
 
 @NgModule({
     imports: [
@@ -14,8 +15,10 @@ import { HomeService } from './home.service';
     ],
     declarations: [
         HomeComponent,
+        ShowImageComponent,
     ],
     entryComponents: [
+        ShowImageComponent
     ],
     providers: [
         HomeService,

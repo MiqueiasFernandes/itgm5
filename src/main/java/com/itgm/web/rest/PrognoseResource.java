@@ -62,6 +62,9 @@ public class PrognoseResource {
         Prognose result = prognoseRepository.save(prognose);
 
         result.setCaminho(prognose.getCenario().getCaminho() + "prognose" + prognose.getId() + "/");
+        result.setCodigo(
+            "prognose.caminho = \"" + result.getCaminho() + "\"\n" +   result.getCodigo()
+        );
 
         result.setToken(
             Itgmrest.executarBatch(
@@ -106,6 +109,11 @@ public class PrognoseResource {
                                 false,
                                 "{}"
                             );
+                            StringBuilder sb = new StringBuilder("{");
+
+                            if (relatorio.startsWith("error:")) {
+                                relatorio = "{\"error\":\"" + relatorio.substring(6) + "\"}";
+                            }
 
                             String[] modelos =  Itgmrest.getContent(
                                 usuario,
@@ -122,7 +130,6 @@ public class PrognoseResource {
                                 .replaceAll("value_", "")
                                 .split(",");
 
-                            StringBuilder sb = new StringBuilder("{");
 
                             for (ModeloExclusivo me : prognose1.getModeloExclusivos()) {
 
@@ -140,6 +147,7 @@ public class PrognoseResource {
                                     sb.append("\"alias\":\"").append(equivalente).append("\"");
                                     sb.append(getResultados(true,usuario,projeto,cenario,diretorio,equivalente));
                                     sb.append(getResultados(false,usuario,projeto,cenario,diretorio,equivalente));
+                                    sb.append(getCoeficientes(prognose1, equivalente));
                                 } else {
                                     sb.append("\"error\":\"o modelo " + me.getModelo().getNome() +
                                         " (" + equivalente + ") não foi encontrado entre os " +
@@ -151,11 +159,9 @@ public class PrognoseResource {
 
                             }
                             sb.append("}");
-
                             prognose1
                                 .setRelatorio("{\"relatorio\":" + relatorio + "," +
                                     "\"resultados\":" + sb.toString() + "}");
-
                             rodando = false;
                         } else {
                             prognose1.setStatus(3);
@@ -167,7 +173,8 @@ public class PrognoseResource {
                             prognose1.setRelatorio("{\"relatorio\":{\"error\":\"" +
                                 ex.toString()
                                     .replaceAll("\\s", " ")
-                                    .replaceAll("\"", "").substring(0, Math.min(200, ex.toString().length())) + "\"}}");
+                                    .replaceAll("\"", "").substring(0, Math.min(200, ex.toString().length())) + "\"}," +
+                                getStringErrorForPrognose(prognose1) + "}");
                             prognose1.setStatus(4);
                             prognoseRepository.save(prognose1);
                         }
@@ -177,7 +184,8 @@ public class PrognoseResource {
                     prognose1.setRelatorio("{\"relatorio\":{\"error\":\"" +
                         e.toString()
                             .replaceAll("\\s", " ")
-                            .replaceAll("\"", "").substring(0, Math.min(200, e.toString().length())) + "\"}}");
+                            .replaceAll("\"", "").substring(0, Math.min(200, e.toString().length())) + "\"}," +
+                        getStringErrorForPrognose(prognose1) + "}");
                     prognose1.setStatus(4);
                     prognoseRepository.save(prognose1);
                 }
@@ -325,5 +333,71 @@ public class PrognoseResource {
         return sb.toString();
     }
 
+
+    String getStringErrorForPrognose(Prognose prognose) {
+        StringBuilder sb = new StringBuilder("\"resultados\":{");
+        String add = "";
+        for(ModeloExclusivo me : prognose.getModeloExclusivos()) {
+            sb.append(add);
+            sb.append("\"" + me.getNome() + "\":{\"alias\":\"\",\"ajuste\":{},\"validacao\":{}");
+            add = ",";
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    String getCoeficientes(Prognose prognose, String alias) {
+        StringBuilder sb = new StringBuilder(",\"coeficientes\":{");
+
+        String coefdap =  Itgmrest.getContent(
+            prognose.getCenario().getProjeto().getUser().getLogin(),
+            prognose.getCenario().getProjeto().getNome(),
+            prognose.getCenario().getNome(),
+            "prognose" + prognose.getId(),
+            "ajuste DAP " + alias + " - coeficientes.csv",
+            "resultados/dap/"+ alias +"/",
+            false,
+            null
+        );
+
+        if (coefdap != null) {
+            sb.append("\"dap\":{");
+            String[] spl =   coefdap.split("\n");
+            for(int i = 1; i < spl.length; i++) {
+                if (i > 1)
+                    sb.append(",");
+                String[] cols =  spl[i].split(",");
+                sb.append("\"").append(cols[0].replaceAll("\"", "")).append("\":").append(cols[1]);
+            }
+            sb.append("}");
+        }
+
+        String coefht =  Itgmrest.getContent(
+            prognose.getCenario().getProjeto().getUser().getLogin(),
+            prognose.getCenario().getProjeto().getNome(),
+            prognose.getCenario().getNome(),
+            "prognose" + prognose.getId(),
+            "ajuste HT " + alias + " - coeficientes.csv",
+            "resultados/ht/"+ alias +"/",
+            false,
+            null
+        );
+
+
+        if (coefht != null) {
+            sb.append(",\"ht\":{");
+            String[] spl =   coefht.split("\n");
+            for(int i = 1; i < spl.length; i++) {
+                if (i > 1)
+                    sb.append(",");
+                String[] cols =  spl[i].split(",");
+                sb.append("\"").append(cols[0].replaceAll("\"", "")).append("\":").append(cols[1]);
+            }
+            sb.append("}");
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
 
 }

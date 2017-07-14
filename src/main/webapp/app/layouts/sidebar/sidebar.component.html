@@ -149,11 +149,12 @@
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).rmse" >RMSE: {{getEstatisticas(prognose,modelo,true,1).rmse | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,true,1).rmsePERCENTUAL | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,1).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,true,1).rrmse | number : '1.2-2' }}</li>
-                                                            <li *ngIf="getResultados(prognose,modelo,true,1).estatisticas2" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" (click)="getArquivoSTAT1(prognose, modelo, true, 0)">
+                                                                Estatisticas
                                                             </li>
-                                                            <li *ngIf="getResultados(prognose,modelo,true,1).coeficientes" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" (click)="getArquivoSTAT2(prognose, modelo, true, 0)">
+                                                                Estatisticas do modelo
                                                             </li>
 
 
@@ -165,10 +166,10 @@
                                                             <i  class="fa fa-bar-chart"></i>
                                                         </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
+                                                            <li class="grafico" (click)="getArquivoGrafBASE(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRES(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRESP(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico" (click)="getArquivoGrafHIST(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -190,11 +191,11 @@
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).rmse" >RMSE: {{getEstatisticas(prognose,modelo,true,2).rmse | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,true,2).rmsePERCENTUAL | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,2).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,true,2).rrmse | number : '1.2-2' }}</li>
-                                                            <li *ngIf="getResultados(prognose,modelo,true,2).estatisticas2" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" (click)="getArquivoSTAT1(prognose, modelo, true, 1)">
+                                                                Estatisticas
                                                             </li>
-                                                            <li *ngIf="getResultados(prognose,modelo,true,2).coeficientes" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" (click)="getArquivoSTAT2(prognose, modelo, true, 1)">
+                                                                Estatisticas do modelo
                                                             </li>
 
 
@@ -206,10 +207,10 @@
                                                             <i  class="fa fa-bar-chart"></i>
                                                         </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
+                                                            <li class="grafico" (click)="getArquivoGrafBASE(prognose, modelo, true, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRES(prognose, modelo, true, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRESP(prognose, modelo, true, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico" (click)="getArquivoGrafHIST(prognose, modelo, true, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -231,11 +232,11 @@
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).rmse" >RMSE: {{getEstatisticas(prognose,modelo,true,3).rmse | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,true,3).rmsePERCENTUAL | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,true,3).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,true,3).rrmse | number : '1.2-2' }}</li>
-                                                            <li *ngIf="getResultados(prognose,modelo,true,3).estatisticas2" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" (click)="getArquivoSTAT1(prognose, modelo, true, 2)">
+                                                                Estatisticas
                                                             </li>
-                                                            <li *ngIf="getResultados(prognose,modelo,true,3).coeficientes" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" (click)="getArquivoSTAT2(prognose, modelo, true, 2)">
+                                                                Estatisticas do modelo
                                                             </li>
 
 
@@ -247,10 +248,10 @@
                                                             <i  class="fa fa-bar-chart"></i>
                                                         </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
+                                                            <li class="grafico" (click)="getArquivoGrafBASE(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRES(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRESP(prognose, modelo, true,0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico" (click)="getArquivoGrafHIST(prognose, modelo, true, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -277,11 +278,11 @@
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).rmse" >RMSE: {{getEstatisticas(prognose,modelo,false,1).rmse | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,false,1).rmsePERCENTUAL | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,1).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,false,1).rrmse | number : '1.2-2' }}</li>
-                                                            <li *ngIf="getResultados(prognose,modelo,false,1).estatisticas2" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" (click)="getArquivoSTAT1(prognose, modelo, false, 0)">
+                                                                Estatisticas
                                                             </li>
-                                                            <li *ngIf="getResultados(prognose,modelo,false,1).coeficientes" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" (click)="getArquivoSTAT2(prognose, modelo, false, 0)">
+                                                                Estatisticas do modelo
                                                             </li>
 
 
@@ -293,10 +294,10 @@
                                                             <i  class="fa fa-bar-chart"></i>
                                                         </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
+                                                            <li class="grafico" (click)="getArquivoGrafBASE(prognose, modelo, false, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRES(prognose, modelo, false, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRESP(prognose, modelo, false, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico" (click)="getArquivoGrafHIST(prognose, modelo, false, 0)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -318,11 +319,11 @@
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).rmse" >RMSE: {{getEstatisticas(prognose,modelo,false,2).rmse | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,false,2).rmsePERCENTUAL | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,2).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,false,2).rrmse | number : '1.2-2' }}</li>
-                                                            <li *ngIf="getResultados(prognose,modelo,false,2).estatisticas2" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" (click)="getArquivoSTAT1(prognose, modelo, false, 1)">
+                                                                Estatisticas
                                                             </li>
-                                                            <li *ngIf="getResultados(prognose,modelo,false,2).coeficientes" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" (click)="getArquivoSTAT2(prognose, modelo, false,1)">
+                                                                Estatisticas do modelo
                                                             </li>
 
 
@@ -334,10 +335,10 @@
                                                             <i  class="fa fa-bar-chart"></i>
                                                         </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
+                                                            <li class="grafico" (click)="getArquivoGrafBASE(prognose, modelo, false, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRES(prognose, modelo, false, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRESP(prognose, modelo, false, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico" (click)="getArquivoGrafHIST(prognose, modelo, false, 1)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -359,11 +360,12 @@
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).rmse" >RMSE: {{getEstatisticas(prognose,modelo,false,3).rmse | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(prognose,modelo,false,3).rmsePERCENTUAL | number : '1.2-2' }}</li>
                                                             <li class="stat" *ngIf="getEstatisticas(prognose,modelo,false,3).rrmse" >RRMSE: {{getEstatisticas(prognose,modelo,false,3).rrmse | number : '1.2-2' }}</li>
-                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).estatisticas2" (click)="getArquivoSTAT1(prognose, modelo, false, 2)">
+                                                                Estatisticas
                                                             </li>
-                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" >
-                                                                <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
+                                                            <li *ngIf="getResultados(prognose,modelo,false,3).coeficientes" (click)="getArquivoSTAT2(prognose, modelo, false, 2)">
+                                                                Estatisticas do modelo
                                                             </li>
 
 
@@ -375,10 +377,10 @@
                                                             <i  class="fa fa-bar-chart"></i>
                                                         </button>
                                                         <ul *ngIf="lista[4] === 2">
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
-                                                            <li class="grafico"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
+                                                            <li class="grafico" (click)="getArquivoGrafBASE(prognose, modelo, false, 2)"> <i class="fa fa-line-chart" aria-hidden="true"></i>ObservadoXEstimado</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRES(prognose, modelo, false, 2)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Absoluto</li>
+                                                            <li class="grafico" (click)="getArquivoGrafRESP(prognose, modelo, false, 2)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Resíduo Percentual</li>
+                                                            <li class="grafico" (click)="getArquivoGrafHIST(prognose, modelo, false,2)"> <i class="fa fa-line-chart" aria-hidden="true"></i>Histograma de Resíduos</li>
                                                         </ul>
                                                     </li>
                                                 </ul>

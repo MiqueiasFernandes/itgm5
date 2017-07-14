@@ -31,6 +31,8 @@ import {PrognoseService} from "../entities/prognose/prognose.service";
 import {ModeloService} from "../entities/modelo/modelo.service";
 import {Modelo} from "../entities/modelo/modelo.model";
 import {FabAddPrognoseComponent} from "../entities/prognose/fab-add-prognose/fab-add-prognose.component";
+import {ShowImageComponent} from "./show-image/show-image.component";
+import {CenarioService} from "../entities/cenario/cenario.service";
 
 @Component({
     selector: 'jhi-home',
@@ -71,6 +73,52 @@ export class HomeComponent implements OnInit {
     prognoses: Prognose[] = [];
     prognoses2: Prognose[] = [];
     modelos: Modelo[] = [];
+    estatisticasLabel = [
+        'BIAS',
+        'Bias percentual',
+        'CE',
+        'correlação',
+        'correlação percentual',
+        'covariância',
+        'covariância percentual',
+        'MAE',
+        'R2',
+        'Resíduo percentual',
+        'Resíduo absoluto',
+        'RMSE',
+        'Rmse percentual',
+        'RRMSE'
+    ];
+    estatisticas = [
+        'BIAS',
+        'BiasPERCENTUAL',
+        'CE',
+        'CORR',
+        'CorrPERCENTUAL',
+        'CV',
+        'CvPERCENTUAL',
+        'MAE',
+        'R2',
+        'ResiduoPERCENTUAL',
+        'Residuos',
+        'RMSE',
+        'RmsePERCENTUAL',
+        'RRMSE'
+    ];
+    graficosLabel = [
+        'Graphico ggplot Observado vesrsus Estimado',
+        'Gráfico de Histograma',
+        'Gráficp de Observado versus Estimado padrão',
+        'Gráfico de Resíduo Absoluto',
+        'Gráfico de Resíduo Percentual'
+    ];
+    graficos = [
+        'getggplot2GraphicObservadoXEstimado',
+        'getGraphicHistogram',
+        'getGraphicObservadoXEstimado',
+        'getGraphicResiduoAbs',
+        'getGraphicResiduoPerc'
+    ];
 
     constructor(
         private jhiLanguageService: JhiLanguageService,
@@ -81,6 +129,7 @@ export class HomeComponent implements OnInit {
         private customizeService: CustomizeService,
         private prognoseService: PrognoseService,
         private terminalService: TerminalService,
+        private cenarioService: CenarioService,
         private modalService: NgbModal,
     ) {
         this.jhiLanguageService.setLocations(['home']);
@@ -113,25 +162,47 @@ export class HomeComponent implements OnInit {
         });
         setTimeout( () => { this.loop(); }, 10000);
     }
-    getResultados(card, val: boolean) {
+
+    getObj(card) {
         let obj: any;
         try {
             obj = JSON.parse(
                 this.prognoses2[card.id].relatorio)
                 .resultados[this.modelos[this.getMeta(card).modelo].nome];
+            return obj;
         } catch (e) {
             console.log(e);
-            return {};
         }
-        return val ? (obj.ajuste ? obj.ajuste : {}) : (obj.validacao ? obj.validacao : {});
+        return {};
     }
+
+    getCoefs(card) {
+        const obj = this.getObj(card);
+        if (obj !== {}) {
+            return obj.coeficientes;
+        }
+        return [];
+    }
+
+    getResultados(card, validacao: boolean) {
+        let obj: any;
+        try {
+            obj = this.getObj(card);
+            return validacao ? (obj.validacao ? obj.validacao : {}) : (obj.ajuste ? obj.ajuste : {}) ;
+        } catch (e) {
+            console.log(e);
+        }
+        return {};
+    }
+
     getGrafico(card, ajuste) {
         const res = this.getResultados(card, ajuste);
         if (res.grafico) {
             return res.grafico;
         }
-        return 'grafico.png';
+        return 'error.png';
     }
+
     getEstatisticas(card, ajuste) {
         let obj = {
             bias: undefined,
@@ -152,7 +223,7 @@ export class HomeComponent implements OnInit {
         } catch (e) {
             console.log(e);
         }
-       return obj;
+        return obj;
     }
     getWarning(card) {
         try {
@@ -169,8 +240,16 @@ export class HomeComponent implements OnInit {
             const error =  obj.resultados[
                 this.modelos[this.getMeta(card).modelo].nome
                 ].error;
-            return (obj.relatorio.error ? obj.relatorio.error  + '; ' : '') +
+            const err = (obj.relatorio.error ? obj.relatorio.error  + '; ' : '') +
                 (error ? error : '') + (obj.error ? ('; ' + obj.error) : '');
+
+            // if (err.startsWith('Error in nlsModel(formula, mf, start, wts): singular gradient matrix at initial parameter estimates')) {
+            // alert('Duplique a prognose e altere os plapites');
+            // this.prognoses2[card.id].relatorio = this.prognoses2[card.id].relatorio.replace('nlsModel', 'nlsmodel');
+            // }
+
+            return err;
+
         } catch (e) {
             console.log(e);
             return '';
@@ -342,7 +421,7 @@ export class HomeComponent implements OnInit {
     }
 
     isResize(card: Card): boolean {
-        return ['figura', 'rbokeh', 'texto', 'codigo'].indexOf(card.modo) >= 0;
+        return ['figura', 'rbokeh', 'texto', 'codigo', 'prognose'].indexOf(card.modo) >= 0;
     }
 
     getPrevia(text: string): string {
@@ -356,10 +435,35 @@ export class HomeComponent implements OnInit {
     isArquivo(card: Card): boolean {
         return [ 'figura', 'rbokeh', 'texto', 'codigo', 'planilha', 'rdata' ].indexOf(card.modo) >= 0;
     }
+
     duplicar(card: Card) {
         const ref = this.modalService.open(FabAddPrognoseComponent, {size: 'lg'});
         ref.componentInstance.setPrognose(this.prognoses2[card.id]);
         this.closeDropDown();
+    }
+
+    showImage(src: string) {
+        const ref = this.modalService.open(ShowImageComponent, {size: 'lg'});
+        ref.componentInstance.setImageSRC(src);
+    }
+
+    showCodigo(card) {
+        const ref = this.modalService.open(ShowImageComponent, {size: 'lg'});
+        ref.componentInstance.setCodigo(this.getCodigo(card));
+    }
+
+    excluirPrognose(card) {
+        const id = this.prognoses2[card.id].id;
+        this.cards.forEach((cards: Card[]) => {
+            cards.forEach((c) => {
+                if (c.modo === 'prognose') {
+                    if (this.prognoses2[c.id].id === id) {
+                        this.fechar(c);
+                    }
+                }
+            });
+        });
+        this.prognoseService.delete(id).subscribe(() => {});
     }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -432,7 +536,7 @@ export class HomeComponent implements OnInit {
     }
 
     reduzir(card: Card) {
-        this.homeService.reduzirCard(card).subscribe( (card2: Card) =>{
+        this.homeService.reduzirCard(card).subscribe( (card2: Card) => {
             this.cards[card2.linha][card2.coluna] = card2;
         });
         this.closeDropDown();
@@ -465,5 +569,93 @@ export class HomeComponent implements OnInit {
                 }
             );
         }
+    }
+
+    getPrognoseByCard(card): Prognose {
+        return this.prognoses2[card.id];
+    }
+
+    getTextBase(card: Card) {
+        const prognose: Prognose = this.getPrognoseByCard(card);
+        if (prognose) {
+            if (prognose.validacao && prognose.validacao.nome) {
+                return   'Base de ajuste: ' + prognose.ajuste.nome + ', Base de validação: ' + prognose.validacao.nome;
+            } else {
+                return   'Base de dados: ' + prognose.ajuste.nome + ', percentual de treino: ' + prognose.treino + '%' +
+                    ', Campo usado para identificador: ' + prognose.dividir;
+            }
+        }
+        return '';
+    }
+
+    getTextModelo(card: Card) {
+        const prognose: Prognose = this.getPrognoseByCard(card);
+        if (prognose) {
+            return  prognose.modeloExclusivos.map( (me) => me.nome ).join(', ');
+        }
+        return '';
+    }
+
+    getTextEstatisticas(card: Card) {
+        const prognose: Prognose = this.getPrognoseByCard(card);
+        if (prognose) {
+            return  prognose.estatisticas
+                .split(',')
+                .map( (str) => this.estatisticasLabel[this.estatisticas.indexOf(str)] )
+                .join(', ');
+        }
+        return '';
+    }
+
+    getTextGraficos(card: Card) {
+        const prognose: Prognose = this.getPrognoseByCard(card);
+        if (prognose) {
+            return  prognose.graficos
+                .split(',')
+                .map( (str) => this.graficosLabel[this.graficos.indexOf(str)] )
+                .join(', ');
+        }
+        return '';
+    }
+
+    getTextMapeamento(card: Card) {
+        const prognose: Prognose = this.getPrognoseByCard(card);
+        if (prognose) {
+            return  prognose.mapeamento;
+        }
+        return '';
+    }
+
+    getCodigo(card: Card) {
+        const prognose: Prognose = this.getPrognoseByCard(card);
+        if (prognose) {
+            return  prognose.codigo;
+        }
+        return '';
+    }
+
+    getRbokeh(card: Card, validacao: boolean) {
+        const prognose = this.prognoses2[card.id];
+        const resultados = this.getObj(card);
+
+        this.customizeService.getCustomize()
+            .subscribe((custom: Customize) => {
+                if (custom.cenario) {
+                    this.cenarioService.publicarArquivo(
+                        custom.cenario,
+                        'prognose' + prognose.id,
+                        '/resultados/' + resultados.alias + '/',
+                        resultados.alias + ' Volume ' + ( validacao ? 'Validacao' : 'Ajuste' ) + 'ObservadoXEstimado.html',
+                        false,  ///meta
+                        false,  ///content
+                        false, ////cript
+                        false
+                    ).subscribe((nfile: any) => {
+                        console.log(nfile);
+                        const token = nfile.file;
+                        window.open('http://itgm.mikeias.net:8098/temp/' + token, '_blank');
+                    });
+                }
+            });
     }
 }

@@ -119,11 +119,15 @@
                         </li>
 
                         <li  *ngIf="isResize(card)" class="dropdown-item" (click)="reduzir(card)">
-                            <i class="fa fa-window-minimize" aria-hidden="true"></i> Ver informações sobre o arquivo
+                            <i class="fa fa-window-minimize" aria-hidden="true"></i> Detalhes
                         </li>
 
                         <li  *ngIf="(prognoses2[card.id] && (prognoses2[card.id].status >= 4))" class="dropdown-item" (click)="duplicar(card)">
                             <i class="fa fa-clone" aria-hidden="true"></i> Criar prognose a partir desta
+                        </li>
+
+                        <li  *ngIf="(prognoses2[card.id] && (prognoses2[card.id].status >= 4))" class="dropdown-item" (click)="excluirPrognose(card)">
+                            <i class="fa fa-trash" aria-hidden="true"></i> Excluir prognose
                         </li>
 
                         <li  class="dropdown-item" (click)="fechar(card)">
@@ -142,6 +146,7 @@
                     <img *ngSwitchCase="'codigo'" src="../../content/images/ext/script.png" class="icone">
                     <img *ngSwitchCase="'rdata'" src="../../content/images/ext/db.png" class="icone">
                     <img *ngSwitchCase="'generic'" src="../../content/images/ext/file.png" class="icone">
+                    <img *ngSwitchCase="'generic'" src="../../content/images/ext/ruby.png" class="icone">
 
                     <p>
                         <b>Tipo:</b> {{card.modo}}
@@ -174,6 +179,27 @@
                     <p *ngIf="isArquivo(card)">
                         <b>URL:</b> <a href="{{getURL(card)}}" target="_blank"> {{getURL(card)}}</a>
                     </p>
+
+                    <div *ngIf="prognoses2[card.id]">
+                        <p>
+                            <b>Base:</b>  {{  getTextBase(card) }}
+                        </p>
+                        <p>
+                            <b>Modelos:</b>  {{  getTextModelo(card) }}
+                        </p>
+                        <p>
+                            <b>Estatísticas:</b>  {{  getTextEstatisticas(card) }}
+                        </p>
+                        <p>
+                            <b>Gráficos:</b>  {{  getTextGraficos(card) }}
+                        </p>
+                        <p>
+                            <b>Mapeamento:</b>  {{  getTextMapeamento(card) }}
+                        </p>
+                        <p>
+                            <a (click)="showCodigo(card)">visualizar código.</a>
+                        </p>
+                    </div>
 
                     <p>
                         <b>Caminho:</b> {{card.caminho}}
@@ -222,69 +248,139 @@
                         </table>
                     </div>
 
-                    <iframe [src]="domSanitizer.bypassSecurityTrustResourceUrl(getURL(card))" *ngSwitchCase="'rbokeh'"></iframe>
+                    <iframe [src]="getURL(card)" *ngSwitchCase="'rbokeh'"></iframe>
 
                     <img [src]="getURL(card)" *ngSwitchCase="'figura'"/>
 
                     <div *ngSwitchCase="'prognose'">
 
-                        <img src="../../content/images/spinners.gif" class="load" *ngIf="!prognoses2[card.id] || (prognoses2[card.id].status < 4)">
+                        <img src="../../content/images/processando.gif" class="load" *ngIf="!prognoses2[card.id] || (prognoses2[card.id].status < 4)">
 
                         <div *ngIf="prognoses2[card.id] && (prognoses2[card.id].status >= 4)" class="esquerdo">
-                            <h2>Ajuste</h2>
+                            <h2>Ajuste <button class="btn btn-info btn-sm" (click)="getRbokeh(card, false)" >
+                                <i class="fa fa-bolt" aria-hidden="true"></i>
+                            </button>
+                            </h2>
 
-                            <img src="http://itgm.mikeias.net:8098/temp/{{getGrafico(card, false)}}">
+                            <img src="http://itgm.mikeias.net:8098/temp/{{getGrafico(card, false)}}" (click)="showImage('http://itgm.mikeias.net:8098/temp/' + getGrafico(card, false))">
 
                             <h4>Estatísticas</h4>
                             <ul>
-                                <li *ngIf="getEstatisticas(card,false).bias" >BIAS: {{getEstatisticas(card,false).bias | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(card,false).biasPERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).ce" >CE: {{getEstatisticas(card,false).ce | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).corr" >correlação: {{getEstatisticas(card,false).corr | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(card,false).corr_PERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).cv" >covariância: {{getEstatisticas(card,false).cv | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(card,false).cvPERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).mae" >MAE: {{getEstatisticas(card,false).mae | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).r2" >R2: {{getEstatisticas(card,false).r2 | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).rmse" >RMSE: {{getEstatisticas(card,false).rmse | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(card,false).rmsePERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,false).rrmse" >RRMSE: {{getEstatisticas(card,false).rrmse | number : '1.2-2' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).bias" >BIAS: {{getEstatisticas(card,false).bias | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(card,false).biasPERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).ce" >CE: {{getEstatisticas(card,false).ce | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).corr" >correlação: {{getEstatisticas(card,false).corr | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(card,false).corr_PERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).cv" >covariância: {{getEstatisticas(card,false).cv | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(card,false).cvPERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).mae" >MAE: {{getEstatisticas(card,false).mae | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).r2" >R2: {{getEstatisticas(card,false).r2 | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).rmse" >RMSE: {{getEstatisticas(card,false).rmse | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(card,false).rmsePERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,false).rrmse" >RRMSE: {{getEstatisticas(card,false).rrmse | number : '1.4-4' }}</li>
                                 <li *ngIf="getResultados(card,false).estatisticas2" >
-                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Resíduos</a>
+                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Download de demais estatísticas</a>
                                 </li>
-                                <li *ngIf="getResultados(card,false).coeficientes" >
-                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>
-                                </li>
+                                <!--<li *ngIf="getResultados(card,false).coeficientes" >-->
+                                    <!--<a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>-->
+                                <!--</li>-->
                             </ul>
                         </div>
 
                         <div *ngIf="prognoses2[card.id] && (prognoses2[card.id].status >= 4)" class="direito">
-                            <h2>Validação</h2>
+                            <h2>Validação<button class="btn btn-info btn-sm" (click)="getRbokeh(card, false)" >
+                                <i class="fa fa-bolt" aria-hidden="true"></i>
+                            </button></h2>
 
-                            <img src="http://itgm.mikeias.net:8098/temp/{{getGrafico(card, true)}}">
+                            <img src="http://itgm.mikeias.net:8098/temp/{{getGrafico(card, true)}}" (click)="showImage('http://itgm.mikeias.net:8098/temp/' + getGrafico(card, true))">
 
                             <h4>Estatísticas</h4>
                             <ul>
-                                <li *ngIf="getEstatisticas(card,true).bias" >BIAS: {{getEstatisticas(card,true).bias | number : '1.2-2'}}</li>
-                                <li *ngIf="getEstatisticas(card,true).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(card,true).biasPERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).ce" >CE: {{getEstatisticas(card,true).ce | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).corr" >correlação: {{getEstatisticas(card,true).corr | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(card,true).corr_PERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).cv" >covariância: {{getEstatisticas(card,true).cv | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(card,true).cvPERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).mae" >MAE: {{getEstatisticas(card,true).mae | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).r2" >R2: {{getEstatisticas(card,true).r2 | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).rmse" >RMSE: {{getEstatisticas(card,true).rmse | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(card,true).rmsePERCENTUAL | number : '1.2-2' }}</li>
-                                <li *ngIf="getEstatisticas(card,true).rrmse" >RRMSE: {{getEstatisticas(card,true).rrmse | number : '1.2-2' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).bias" >BIAS: {{getEstatisticas(card,true).bias | number : '1.4-4'}}</li>
+                                <li *ngIf="getEstatisticas(card,true).biasPERCENTUAL" >Bias percentual: {{getEstatisticas(card,true).biasPERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).ce" >CE: {{getEstatisticas(card,true).ce | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).corr" >correlação: {{getEstatisticas(card,true).corr | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).corr_PERCENTUAL" >correlação percentual: {{getEstatisticas(card,true).corr_PERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).cv" >covariância: {{getEstatisticas(card,true).cv | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).cvPERCENTUAL" >covariância percentual: {{getEstatisticas(card,true).cvPERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).mae" >MAE: {{getEstatisticas(card,true).mae | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).r2" >R2: {{getEstatisticas(card,true).r2 | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).rmse" >RMSE: {{getEstatisticas(card,true).rmse | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(card,true).rmsePERCENTUAL | number : '1.4-4' }}</li>
+                                <li *ngIf="getEstatisticas(card,true).rrmse" >RRMSE: {{getEstatisticas(card,true).rrmse | number : '1.4-4' }}</li>
                                 <li *ngIf="getResultados(card,true).estatisticas2" >
-                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, true).estatisticas2}}">Resíduos</a>
+                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, true).estatisticas2}}">Download de demais estatísticas</a>
                                 </li>
-                                <li *ngIf="getResultados(card,true).coeficientes" >
-                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, true).coeficientes}}">Coeficientes</a>
-                                </li>
+                                <!--<li *ngIf="getResultados(card,true).coeficientes" >-->
+                                    <!--<a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, true).coeficientes}}">Coeficientes</a>-->
+                                <!--</li>-->
                             </ul>
                         </div>
+
+                        <table class="coeficientes" *ngIf="getCoefs(card) && getCoefs(card).dap && getCoefs(card).ht">
+                            <tbody>
+                            <tr class="header">
+                                <td>Coeficiente</td>
+                                <td>DAP</td>
+                                <td>HT</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b0 || getCoefs(card).ht.b0">
+                                <td>b0</td>
+                                <td>{{getCoefs(card).dap.b0 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b0 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b1 || getCoefs(card).ht.b1">
+                                <td>b1</td>
+                                <td>{{getCoefs(card).dap.b1 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b1 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b2 || getCoefs(card).ht.b2">
+                                <td>b2</td>
+                                <td>{{getCoefs(card).dap.b2 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b2 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b3 || getCoefs(card).ht.b3">
+                                <td>b3</td>
+                                <td>{{getCoefs(card).dap.b3 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b3 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b4 || getCoefs(card).ht.b4">
+                                <td>b4</td>
+                                <td>{{getCoefs(card).dap.b4 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b4 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b5 || getCoefs(card).ht.b5">
+                                <td>b5</td>
+                                <td>{{getCoefs(card).dap.b5 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b5 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b6 || getCoefs(card).ht.b6">
+                                <td>b6</td>
+                                <td>{{getCoefs(card).dap.b6 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b6 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b7 || getCoefs(card).ht.b7">
+                                <td>b7</td>
+                                <td>{{getCoefs(card).dap.b7 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b7 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b8 || getCoefs(card).ht.b8">
+                                <td>b8</td>
+                                <td>{{getCoefs(card).dap.b8 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b8 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b9 || getCoefs(card).ht.b9">
+                                <td>b9</td>
+                                <td>{{getCoefs(card).dap.b9 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b9 | number : '1.4-4' }}</td>
+                            </tr>
+                            <tr class="beta" *ngIf="getCoefs(card).dap.b10 || getCoefs(card).ht.b10">
+                                <td>b10</td>
+                                <td>{{getCoefs(card).dap.b10 | number : '1.4-4' }}</td>
+                                <td>{{getCoefs(card).ht.b10 | number : '1.4-4' }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
 
                         <div *ngIf="prognoses2[card.id] && (prognoses2[card.id].status >= 4)" class="relatorio">
                             <span  class="war">{{getWarning(card)}}</span>
