@@ -62,9 +62,9 @@ public class TerminalResource {
             cenario.getNome(),
             terminal.getNome(),
             new String[]{"LIVE", "log.txt", "DEBUG", "--vanilla"},
-            100,
-            100,
-            100,
+            2000,
+            2000,
+            400,
             true,
             "null"
         );

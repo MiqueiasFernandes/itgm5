@@ -1,0 +1,120 @@
+// JDL definition for application 'itgm' generated with command 'yo jhipster:export-jdl'
+
+entity Projeto (projeto) {
+  nome String,
+  caminho String,
+  arquivos String
+}
+entity Modelo (modelo) {
+  nome String,
+  cor String,
+  formula String,
+  funcao String,
+  variaveis String,
+  palpite String,
+  parametros String,
+  requires String,
+  codigo String
+}
+entity Cenario (cenario) {
+  nome String,
+  caminho String
+}
+entity Compartilhar (compartilhar) {
+  tipo String,
+  mensagem String,
+  codigo String,
+  nome String,
+  status Integer
+}
+entity Base (base) {
+  nome String,
+  local String
+}
+entity ModeloExclusivo (modelo_exclusivo) {
+  nome String,
+  mapeamento String,
+  palpite String
+}
+entity Customize (customize) {
+  sidebar Boolean,
+  color String,
+  avatar byte[],
+  desktop String
+}
+entity Terminal (terminal) {
+  nome String,
+  url String,
+  status Integer
+}
+entity Card (card) {
+  nome String,
+  url String,
+  https Boolean,
+  meta String,
+  previa String,
+  disposicao String,
+  tipo Integer,
+  linha Integer,
+  coluna Integer,
+  modo String,
+  caminho String,
+  arquivo String,
+  extensao String,
+  largura Integer,
+  classe String,
+  codigo String
+}
+entity Prognose (prognose) {
+  nome String,
+  caminho String,
+  mapeamento String,
+  salvar String,
+  graficos String,
+  estatisticas String,
+  forcepredict Boolean,
+  dividir String,
+  agrupar String,
+  treino Float,
+  fncalculavolume String,
+  status Integer,
+  codigo String maxlength(40000),
+  resultado String,
+  token String,
+  relatorio String maxlength(20000)
+}
+
+relationship OneToOne {
+  Customize{user(login)} to User,
+  Customize{projeto} to Projeto,
+  Customize{cenario} to Cenario
+}
+relationship ManyToOne {
+  Projeto{user(login)} to User,
+  Modelo{user(login)} to User,
+  Cenario{projeto} to Projeto,
+  Compartilhar{remetente(login)} to User,
+  Compartilhar{destinatario(login)} to User,
+  Base{projeto} to Projeto,
+  ModeloExclusivo{modelo} to Modelo,
+  ModeloExclusivo{cenario} to Cenario,
+  Terminal{cenario} to Cenario,
+  Card{cenario} to Cenario,
+  Prognose{ajuste} to Base,
+  Prognose{validacao} to Base,
+  Prognose{cenario} to Cenario
+}
+relationship ManyToMany {
+  Prognose{modeloExclusivo} to ModeloExclusivo{prognose}
+}
+
+paginate Projeto with pagination
+paginate Modelo with pagination
+paginate Cenario with pagination
+paginate Compartilhar with pagination
+paginate Base with pagination
+paginate ModeloExclusivo with pagination
+paginate Customize with pagination
+paginate Terminal with pagination
+paginate Card with pagination
+paginate Prognose with pagination

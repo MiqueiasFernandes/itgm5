@@ -35,6 +35,9 @@ export class FabAddPrognoseComponent implements OnInit {
     labeldap2 = 'campo';
     labelht1 = 'campo';
     labelht2 = 'campo';
+    labelparcela = 'campo';
+    labelidade2 = 'campo';
+    labelareacorr = 'campo';
     chekMod = [];
     chekEst = [];
     chekGraf = [];
@@ -74,19 +77,23 @@ export class FabAddPrognoseComponent implements OnInit {
         'estatisticasRRMSE'
     ];
     graficosLabel = [
-        // 'Graphico ggplot Observado vesrsus Estimado',
+        // 'getggplot2GraphicObservadoXEstimadoTotal',
+        'Graphico ggplot Observado vesrsus Estimado Colorido',
         'Gráfico de Histograma',
         'Gráficp de Observado versus Estimado padrão',
         'Gráfico de Resíduo Absoluto',
         'Gráfico de Resíduo Percentual',
+        'Gráfico Total por parcela',
         'Gráfico dinâmico'
     ];
     graficos = [
-        // 'getggplot2GraphicObservadoXEstimado',
+        // 'getggplot2GraphicObservadoXEstimadoTotal',
+        'getggplot2GraphicObservadoXEstimado',
         'getGraphicHistogram',
         'getGraphicObservadoXEstimado',
         'getGraphicResiduoAbs',
         'getGraphicResiduoPerc',
+        'getGraphicVolumeTotal',
         'plotRB'
     ];
     bases: Base[] = [];
@@ -132,11 +139,12 @@ export class FabAddPrognoseComponent implements OnInit {
                                                 if (this.campos.indexOf(campo) < 0) {
                                                     this.campos.push(campo);
 
-                                                    if (campo.toLowerCase().indexOf('id') >= 0) {
+                                                    if (campo.toLowerCase().indexOf('parcela') >= 0) {
                                                         if ('campo' === this.prognose.dividir) {
                                                             this.setDividir(campo);
                                                         }
-                                                    }else {
+                                                        this.setparcela(campo);
+                                                    } else {
                                                         switch (campo.toLowerCase()) {
                                                             case 'dap1':
                                                                 this.setdap1(campo);
@@ -149,6 +157,12 @@ export class FabAddPrognoseComponent implements OnInit {
                                                                 break;
                                                             case 'ht2':
                                                                 this.setht2(campo);
+                                                                break;
+                                                            case 'idadearred2':
+                                                                this.setidade2(campo);
+                                                                break;
+                                                            case 'areacorr':
+                                                                this.setareacorr(campo);
                                                                 break;
                                                         }
                                                     }
@@ -174,7 +188,7 @@ export class FabAddPrognoseComponent implements OnInit {
                 }
             });
         this.prognose.treino = 70;
-        this.prognose.graficos = 'getggplot2GraphicObservadoXEstimado';
+        this.prognose.graficos = 'getggplot2GraphicObservadoXEstimadoTotal';
     }
 
     setPrognose(prognose: Prognose) {
@@ -193,6 +207,8 @@ export class FabAddPrognoseComponent implements OnInit {
             this.setdap2( obj.dap2);
             this.setht1(obj.ht1);
             this.setht2(obj.ht2);
+            this.setparcela(obj.parcela);
+            this.setidade2(obj.idade2);
         } catch (e) {
             console.log(e);
         }
@@ -251,6 +267,7 @@ export class FabAddPrognoseComponent implements OnInit {
                 this.feito = this.prognose.graficos && this.prognose.graficos.length > 1;
                 break;
             case 5:
+                this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
                 this.feito = this.codigo.isMapeado();
                 break;
             case 6:
@@ -397,23 +414,31 @@ export class FabAddPrognoseComponent implements OnInit {
     }
     setdap1(campo) {
         this.codigo.mapeamento.dap1 =  this.labeldap1 = campo;
-        this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
         this.verificar();
     }
 
     setdap2(campo) {
         this.codigo.mapeamento.dap2 =  this.labeldap2 = campo;
-        this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
         this.verificar();
     }
     setht1(campo) {
         this.codigo.mapeamento.ht1 =  this.labelht1 = campo;
-        this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
         this.verificar();
     }
     setht2(campo) {
         this.codigo.mapeamento.ht2 =  this.labelht2 = campo;
-        this.prognose.mapeamento = JSON.stringify(this.codigo.mapeamento);
+        this.verificar();
+    }
+    setparcela(campo) {
+        this.codigo.mapeamento.parcela =  this.labelparcela = campo;
+        this.verificar();
+    }
+    setareacorr(campo) {
+        this.codigo.mapeamento.areacorr =  this.labelareacorr = campo;
+        this.verificar();
+    }
+    setidade2(campo) {
+        this.codigo.mapeamento.idade2 =  this.labelidade2 = campo;
         this.verificar();
     }
     invertMod() {
@@ -498,18 +523,22 @@ export class Codigo {
         dap1: null,
         dap2: null,
         ht1: null,
-        ht2: null
+        ht2: null,
+        parcela: null,
+        idade2: null,
+        areacorr: null
     };
     constructor() {
         this.modo = 0;
         this.estatisitcas = [];
         this.graficos = [];
-        this.graficos.push('getggplot2GraphicObservadoXEstimado');
+        this.graficos.push('getggplot2GraphicObservadoXEstimadoTotal');
         this.resetCodigo();
     }
     isMapeado(): boolean {
         return this.mapeamento.dap1 && this.mapeamento.dap2 &&
-            this.mapeamento.ht1 && this.mapeamento.ht2;
+            this.mapeamento.ht1 && this.mapeamento.ht2
+            && this.mapeamento.parcela && this.mapeamento.idade2 && this.mapeamento.areacorr;
     }
 
     resetCodigo(): Codigo {
@@ -556,12 +585,15 @@ export class Codigo {
             this.codigo +=
                 'cfg$modelos=c('  + this.modelos + ')\n' +
                 'cfg$estatisticas=list(funcoes=c(' + prognose.estatisticas + '))\n' +
-                'cfg$graficos=list(funcoes=c(' + prognose.graficos + '),vetorial=F,diretorio=prognose.caminho)\n' +
+                'cfg$graficos=list(funcoes=c(' + prognose.graficos + '),vetorial=F,diretorio=prognose.caminho,totalizar=TRUE,campoID="' + this.mapeamento.parcela + '")\n' +
                 'cfg$mapeamento=list(' +
                 'dap1=\"' + this.mapeamento.dap1 + '\",' +
                 'dap2=\"' + this.mapeamento.dap2 + '\",' +
                 'ht1=\"' + this.mapeamento.ht1 + '\",' +
-                'ht2=\"' + this.mapeamento.ht2 + '\")\n' +
+                'ht2=\"' + this.mapeamento.ht2 + '\",' +
+                'parcela=\"' + this.mapeamento.parcela + '\",' +
+                'areacorr=\"' + this.mapeamento.areacorr + '\",' +
+                'idade2=\"' + this.mapeamento.idade2 + '\")\n' +
                 'cfg$salvar=' + prognose.salvar + '\n' +
                 'cfg$fnCalculaVolume=' + prognose.fncalculavolume + '\n' +
                 'cfg$forcePredict=' + (prognose.forcepredict  ? 'TRUE' : 'FALSE') + '\n' +

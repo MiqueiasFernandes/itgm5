@@ -21,8 +21,10 @@ public class Itgmrest {
 
     private static final boolean UPLOAD_ALTERNATIVO = true;
 
-    private static final String HOST = "itgm.mikeias.net";
-    private static final String SERVER = "http://"+HOST+":8080/";
+    private static final String HOST = "localhost";
+    private static final String SERVER = "http://"+HOST+":8090/";
+//    private static final String HOST = "itgm.mikeias.net";
+//    private static final String SERVER = "http://"+HOST+":8080/";
     private static final String SERVICE = SERVER + "ITGMRest2/webresources/jriaccess/";
     //    @GET
     private static final String PATH_GET_PROCESSOS = SERVICE + "process/";
@@ -325,8 +327,8 @@ public class Itgmrest {
             "&parametros=log.txt" +
             "&parametros=INFO" +
             "&memoria=2000" +
-            "&cpu=100" +
-            "&disco=500" +
+            "&cpu=400" +
+            "&disco=2000" +
             "&salvar=true";
         try {
             return (String) postOnTemplate(

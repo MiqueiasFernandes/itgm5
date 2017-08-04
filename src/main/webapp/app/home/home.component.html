@@ -262,7 +262,7 @@
                             </button>
                             </h2>
 
-                            <img src="http://itgm.mikeias.net:8098/temp/{{getGrafico(card, false)}}" (click)="showImage('http://itgm.mikeias.net:8098/temp/' + getGrafico(card, false))">
+                            <img src="http://{{SERVIDOR}}:8098/temp/{{getGrafico(card, false)}}" (click)="showImage('http://localhost:8098/temp/' + getGrafico(card, false))">
 
                             <h4>Estatísticas</h4>
                             <ul>
@@ -279,7 +279,7 @@
                                 <li *ngIf="getEstatisticas(card,false).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(card,false).rmsePERCENTUAL | number : '1.4-4' }}</li>
                                 <li *ngIf="getEstatisticas(card,false).rrmse" >RRMSE: {{getEstatisticas(card,false).rrmse | number : '1.4-4' }}</li>
                                 <li *ngIf="getResultados(card,false).estatisticas2" >
-                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).estatisticas2}}">Download de demais estatísticas</a>
+                                    <a href="http://localhost:8098/temp/{{getResultados(card, false).estatisticas2}}">Download de demais estatísticas</a>
                                 </li>
                                 <!--<li *ngIf="getResultados(card,false).coeficientes" >-->
                                     <!--<a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, false).coeficientes}}">Coeficientes</a>-->
@@ -288,11 +288,11 @@
                         </div>
 
                         <div *ngIf="prognoses2[card.id] && (prognoses2[card.id].status >= 4)" class="direito">
-                            <h2>Validação<button class="btn btn-info btn-sm" (click)="getRbokeh(card, false)" >
+                            <h2>Validação<button class="btn btn-info btn-sm" (click)="getRbokeh(card, true)" >
                                 <i class="fa fa-bolt" aria-hidden="true"></i>
                             </button></h2>
 
-                            <img src="http://itgm.mikeias.net:8098/temp/{{getGrafico(card, true)}}" (click)="showImage('http://itgm.mikeias.net:8098/temp/' + getGrafico(card, true))">
+                            <img src="http://{{SERVIDOR}}:8098/temp/{{getGrafico(card, true)}}" (click)="showImage('http://localhost:8098/temp/' + getGrafico(card, true))">
 
                             <h4>Estatísticas</h4>
                             <ul>
@@ -309,7 +309,7 @@
                                 <li *ngIf="getEstatisticas(card,true).rmsePERCENTUAL" >Rmse percentual: {{getEstatisticas(card,true).rmsePERCENTUAL | number : '1.4-4' }}</li>
                                 <li *ngIf="getEstatisticas(card,true).rrmse" >RRMSE: {{getEstatisticas(card,true).rrmse | number : '1.4-4' }}</li>
                                 <li *ngIf="getResultados(card,true).estatisticas2" >
-                                    <a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, true).estatisticas2}}">Download de demais estatísticas</a>
+                                    <a href="http://localhost:8098/temp/{{getResultados(card, true).estatisticas2}}">Download de demais estatísticas</a>
                                 </li>
                                 <!--<li *ngIf="getResultados(card,true).coeficientes" >-->
                                     <!--<a href="http://itgm.mikeias.net:8098/temp/{{getResultados(card, true).coeficientes}}">Coeficientes</a>-->

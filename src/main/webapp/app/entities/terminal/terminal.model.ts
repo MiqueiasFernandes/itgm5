@@ -16,7 +16,6 @@ export class Terminal {
     private sockets: Subject<any>[] = [];
 
 
-
     constructor(
         public id?: number,
         public nome?: string,
@@ -82,7 +81,7 @@ export class Terminal {
                                 break;
                         }
                     });
-            })
+            });
 
         }else{
             alert('error status ' + this.status);
@@ -108,9 +107,9 @@ export class Terminal {
 
 
     private create(url): Subject<any> {
-        let ws = new WebSocket(url);
+        const ws = new WebSocket(url);
 
-        let observable = Observable.create(
+        const observable = Observable.create(
             (obs: Observer<MessageEvent>) => {
                 ws.onmessage = obs.next.bind(obs);
                 ws.onerror = obs.error.bind(obs);
@@ -120,7 +119,7 @@ export class Terminal {
             }
         );
 
-        let observer = {
+        const observer = {
             next: (data: any) => {
                 if (ws.readyState === WebSocket.OPEN) {
                     console.log('enviando: ' + data);

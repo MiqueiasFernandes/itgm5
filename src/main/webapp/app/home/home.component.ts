@@ -63,6 +63,9 @@ import {CenarioService} from "../entities/cenario/cenario.service";
 
 })
 export class HomeComponent implements OnInit {
+
+    SERVIDOR = 'localhost';
+
     account: Account;
     modalRef: NgbModalRef;
     cards: Card[][] = [];
@@ -177,9 +180,13 @@ export class HomeComponent implements OnInit {
     }
 
     getCoefs(card) {
+        try {
         const obj = this.getObj(card);
         if (obj !== {}) {
             return obj.coeficientes;
+        }
+        } catch (e) {
+            console.log(e);
         }
         return [];
     }
@@ -196,9 +203,13 @@ export class HomeComponent implements OnInit {
     }
 
     getGrafico(card, ajuste) {
-        const res = this.getResultados(card, ajuste);
-        if (res.grafico) {
-            return res.grafico;
+        try {
+            const res = this.getResultados(card, ajuste);
+            if (res.grafico) {
+                return res.grafico;
+            }
+        } catch (e) {
+            console.log(e);
         }
         return 'error.png';
     }
@@ -234,6 +245,7 @@ export class HomeComponent implements OnInit {
         }
     }
     getError(card) {
+
         try {
             const obj = JSON.parse(this.prognoses2[card.id].relatorio);
             // console.log(obj);
@@ -292,9 +304,9 @@ export class HomeComponent implements OnInit {
                                     this.transitions[card.id] = 'in';
                                     let meta: any = this.getMeta(card);
                                     meta = Object.assign(meta,
-                                        {endereco: 'http://itgm.mikeias.net:8098/temp/',
-                                            enderecoseguro: 'https://itgm.mikeias.net:8099/temp/',
-                                            enderecows: 'ws://itgm.mikeias.net:8080/ITGMRest2/jriaccesslive/'
+                                        {endereco: 'http://' + this.SERVIDOR + ':8098/temp/',
+                                            enderecoseguro: 'https://' + this.SERVIDOR + ':8099/temp/',
+                                            enderecows: 'ws://' + this.SERVIDOR + ':8090/ITGMRest2/jriaccesslive/'
                                         });
                                     card.meta = JSON.stringify(meta);
                                     if (!this.cards[linha] ||
@@ -644,8 +656,8 @@ export class HomeComponent implements OnInit {
                     this.cenarioService.publicarArquivo(
                         custom.cenario,
                         'prognose' + prognose.id,
-                        '/resultados/' + resultados.alias + '/',
-                        resultados.alias + ' Volume ' + ( validacao ? 'Validacao' : 'Ajuste' ) + 'ObservadoXEstimado.html',
+                        '/resultados/' + resultados.alias + (validacao ? '/validacao/' : '/' ),
+                        resultados.alias + ' Volume ' + ( validacao ? 'Validacao' : 'Ajuste' ) + ' ' + 'ObservadoXEstimado.html',
                         false,  ///meta
                         false,  ///content
                         false, ////cript
@@ -653,7 +665,7 @@ export class HomeComponent implements OnInit {
                     ).subscribe((nfile: any) => {
                         console.log(nfile);
                         const token = nfile.file;
-                        window.open('http://itgm.mikeias.net:8098/temp/' + token, '_blank');
+                        window.open('http://' + this.SERVIDOR + ':8098/temp/' + token, '_blank');
                     });
                 }
             });

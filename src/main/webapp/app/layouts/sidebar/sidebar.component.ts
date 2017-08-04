@@ -134,7 +134,7 @@ export class SidebarComponent implements OnInit {
                 (account.firstName ? account.firstName : '') + ' ' +
                 (account.lastName ? account.lastName : '');
             this.email = account.email;
-            this.image = account.imageUrl ? ('http://itgm.mikeias.net:8098/temp/' + account.imageUrl) : null;
+            this.image = account.imageUrl ? ('http://localhost:8098/temp/' + account.imageUrl) : null;
         }
     }
 
@@ -472,12 +472,12 @@ export class SidebarComponent implements OnInit {
     getArquivoSTAT1(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
         const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
         // return dados[0] + dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas.csv';
-        this.show(prognose, dados[0], dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas.csv');
+        this.show(prognose, dados[0], dados[1].toLowerCase() + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas.csv');
     }
     getArquivoSTAT2(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
         const dados = this.getDiretorio(prognose, modelo, ajuste, modo);
         // return dados[0] + dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas do modelo.csv';
-        this.show(prognose, dados[0], dados[1] + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas do modelo.csv');
+        this.show(prognose, dados[0], dados[1].toLowerCase() + ' ' + dados[2] + ' ' + dados[3] + ' - estatisticas do modelo.csv');
     }
     getArquivoGrafGG(prognose: Prognose, modelo: ModeloExclusivo, ajuste: boolean, modo: number) {
         const dados = this.getDiretorio(prognose, modelo, ajuste, modo);

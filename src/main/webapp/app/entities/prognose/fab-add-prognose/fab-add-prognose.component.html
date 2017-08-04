@@ -187,7 +187,7 @@
                         <ul>
                             <li>
                                 <input type="checkbox" id="'graf-999"  checked disabled>
-                                <label for="'graf-999">Gráfico Observado X Estimado</label>
+                                <label for="'graf-999">Gráfico Observado X Estimado Total</label>
                             </li>
                             <li *ngFor="let grafico of graficos;let id = index">
                                 <input type="checkbox" id="'graf-' + {{id}}" (change)="addGraficos($event, grafico)"  [checked]="chekGraf[grafico]">
@@ -252,6 +252,48 @@
                             <ul class="dropdown-menu" ngbDropdownMenu>
                                 <li *ngFor="let campo of campos">
                                     <a class="dropdown-item" (click)="setht2(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        IDADE2:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labelidade2}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setidade2(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        PARCELA:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labelparcela}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setparcela(campo)">
+                                        {{campo}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        AREACOR:
+                        <div ngbDropdown class="nav-item dropdown pointer">
+                            <button class="dropdown-toggle btn-default" ngbDropdownToggle>
+                                {{labelareacorr}}
+                            </button>
+                            <ul class="dropdown-menu" ngbDropdownMenu>
+                                <li *ngFor="let campo of campos">
+                                    <a class="dropdown-item" (click)="setareacorr(campo)">
                                         {{campo}}
                                     </a>
                                 </li>

@@ -145,8 +145,8 @@ public class PrognoseResource {
                                 })){
                                     ///obter grafico principal de ajuste e validacao
                                     sb.append("\"alias\":\"").append(equivalente).append("\"");
-                                    sb.append(getResultados(true,usuario,projeto,cenario,diretorio,equivalente));
-                                    sb.append(getResultados(false,usuario,projeto,cenario,diretorio,equivalente));
+                                    sb.append(getResultados(true,usuario,projeto,cenario,diretorio,equivalente, prognose1));
+                                    sb.append(getResultados(false,usuario,projeto,cenario,diretorio,equivalente, prognose1));
                                     sb.append(getCoeficientes(prognose1, equivalente));
                                 } else {
                                     sb.append("\"error\":\"o modelo " + me.getModelo().getNome() +
@@ -275,16 +275,19 @@ public class PrognoseResource {
                          String projeto,
                          String cenario,
                          String diretorio,
-                         String equivalente) {
+                         String equivalente,
+                         Prognose prognose) {
         StringBuilder sb = new StringBuilder(",\"" + (metodo ? "ajuste" : "validacao") + "\":{");
         sb.append("\"grafico\":\"")
             .append( Itgmrest.publicFile(
                 usuario,
                 projeto,
                 cenario,
-                diretorio,
+                diretorio, /////total por parcela adaptadobellaecamposeleite Volume Validacao ObservadoxEstimado
                 "resultados/" + equivalente + "/"  + (metodo ? "" : "validacao/"),
-                equivalente + " Volume " + (metodo ? "Ajuste" : "Validacao") + ".png",
+                "total por " + prognose.getMapeamento()
+                    .replaceAll(".*parcela\":\"", "")
+                    .split("\"")[0] + " " + equivalente + " Volume " + (metodo ? "Ajuste" : "Validacao") + " ObservadoxEstimado.png",
                 false,
                 true))
             .append("\"");
